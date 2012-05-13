@@ -1,20 +1,15 @@
 # HG changeset patch
 # Parent c758cc9b60e5d662c2d8b72f5bd4634baa3f327e
 # User Hernan Rodriguez Colmeiro <colmeiro@gmail.com>
-diff --git a/browser/components/preferences/in-content/landing.xul b/browser/components/preferences/in-content/landing.xul
---- a/browser/components/preferences/in-content/landing.xul
-+++ b/browser/components/preferences/in-content/landing.xul
-@@ -52,8 +52,674 @@
-     <button label="&paneAdvanced.title;" class="landingButton"
-             oncommand="gotoPref('paneAdvanced');">
-       <image class="landingButton-icon" type="advanced"/>
-       <label class="landingButton-label">&paneAdvanced.title;</label>
-     </button>
- 
-   </hbox>
- </vbox>
-+
-+<?xml version="1.0"?>
+
+diff --git a/browser/components/preferences/in-content/preferences.xul b/browser/components/preferences/in-content/preferences.xul
+--- a/browser/components/preferences/in-content/preferences.xul
++++ b/browser/components/preferences/in-content/preferences.xul
+@@ -1,25 +1,67 @@
+ <?xml version="1.0"?>
+-<!-- This Source Code Form is subject to the terms of the Mozilla Public
+-   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+-   - You can obtain one at http://mozilla.org/MPL/2.0/. -->
 +<!-- ***** BEGIN LICENSE BLOCK *****
 +   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
 +   -
@@ -52,23 +47,62 @@ diff --git a/browser/components/preferences/in-content/landing.xul b/browser/com
 +   - the terms of any one of the MPL, the GPL or the LGPL.
 +   -
 +   - ***** END LICENSE BLOCK ***** -->
-+
+ 
+-<?xml-stylesheet href="chrome://global/skin/global.css"?>
 +<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 +<?xml-stylesheet href="chrome://mozapps/content/extensions/extensions.css"?>
 +<?xml-stylesheet href="chrome://mozapps/skin/extensions/extensions.css"?>
+ 
+ <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
+ 
+ <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
+ <?xml-stylesheet 
+   href="chrome://browser/skin/preferences/in-content/preferences.css"?>
+ <?xml-stylesheet 
+   href="chrome://browser/content/preferences/handlers.css"?>
+ <?xml-stylesheet href="chrome://browser/skin/preferences/applications.css"?>
+ 
 +
-+<!DOCTYPE page [
+ <!DOCTYPE page [
 +<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
 +%brandDTD;
 +<!ENTITY % extensionsDTD SYSTEM "chrome://mozapps/locale/extensions/extensions.dtd">
 +%extensionsDTD;
-+]>
 +
+ <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+ <!ENTITY % preferencesDTD SYSTEM 
+   "chrome://browser/locale/preferences/preferences.dtd">
+ <!ENTITY % privacyDTD SYSTEM "chrome://browser/locale/preferences/privacy.dtd">
+ <!ENTITY % tabsDTD SYSTEM "chrome://browser/locale/preferences/tabs.dtd">
+ <!ENTITY % syncBrandDTD SYSTEM "chrome://browser/locale/syncBrand.dtd">
+ <!ENTITY % syncDTD SYSTEM "chrome://browser/locale/preferences/sync.dtd">
+ <!ENTITY % securityDTD SYSTEM 
+@@ -49,24 +91,636 @@
+ 
+ #ifdef XP_WIN
+ #define USE_WIN_TITLE_STYLE
+ #endif
+ #ifdef XP_OS2
+ #define USE_WIN_TITLE_STYLE
+ #endif
+ 
+-<page onload="init_all();"
+-      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+-      xmlns:html="http://www.w3.org/1999/xhtml"
 +<page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 +      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-+      id="addons-page" title="&addons.windowTitle;"
-+      role="application" windowtype="Addons:Manager"
++      xmlns:html="http://www.w3.org/TR/REC-html40"
++      id="addons-page"
+ #ifdef USE_WIN_TITLE_STYLE
+-      title="&prefWindow.titleWin;">
++      title="&prefWindow.titleWin;"
+ #else
+-      title="&prefWindow.titleGNOME;">
++      title="&prefWindow.titleGNOME;"
+ #endif
++     role="application" windowtype="Addons:Manager"
 +      disablefastfind="true"
++      onload="init_all();"
 +      ondragenter="gDragDrop.onDragOver(event)"
 +      ondragover="gDragDrop.onDragOver(event)"
 +      ondrop="gDragDrop.onDrop(event)"
@@ -677,5 +711,22 @@ diff --git a/browser/components/preferences/in-content/landing.xul b/browser/com
 +
 +    </box>
 +  </hbox>
-+
-+</page>
+ 
+   <script type="application/javascript"
+           src="chrome://browser/content/utilityOverlay.js"/>
+   <script type="application/javascript"
+           src="chrome://browser/content/preferences/in-content/preferences.js"/>
+ 
+   <stringbundle id="bundleBrand" 
+                 src="chrome://branding/locale/brand.properties"/>
+@@ -97,10 +751,9 @@
+ #include applications.xul
+ #include content.xul
+ #include security.xul
+ #ifdef MOZ_SERVICES_SYNC
+ #include sync.xul
+ #endif
+     </prefpane>
+   </hbox>
+-  
+ </page>
