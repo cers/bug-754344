@@ -1,14 +1,18 @@
 # HG changeset patch
-# Parent 59f95ed301916d991227861a4e6769354b629cc0
+# Parent c758cc9b60e5d662c2d8b72f5bd4634baa3f327e
 # User Hernan Rodriguez Colmeiro <colmeiro@gmail.com>
-
 diff --git a/browser/components/preferences/in-content/landing.xul b/browser/components/preferences/in-content/landing.xul
 --- a/browser/components/preferences/in-content/landing.xul
 +++ b/browser/components/preferences/in-content/landing.xul
-@@ -725,3 +725,671 @@
-   </hbox>
+@@ -52,8 +52,674 @@
+     <button label="&paneAdvanced.title;" class="landingButton"
+             oncommand="gotoPref('paneAdvanced');">
+       <image class="landingButton-icon" type="advanced"/>
+       <label class="landingButton-label">&paneAdvanced.title;</label>
+     </button>
  
- </page>
+   </hbox>
+ </vbox>
 +
 +<?xml version="1.0"?>
 +<!-- ***** BEGIN LICENSE BLOCK *****
@@ -119,8 +123,6 @@ diff --git a/browser/components/preferences/in-content/landing.xul b/browser/com
 +                accesskey="&cmd.about.accesskey;"/>
 +    </menupopup>
 +  </popupset>
-+
-+
 +
 +  <!-- global commands - these act on all addons, or affect the addons manager
 +       in some other way -->
