@@ -2,6 +2,73 @@
 # Parent c758cc9b60e5d662c2d8b72f5bd4634baa3f327e
 # User Hernan Rodriguez Colmeiro <colmeiro@gmail.com>
 
+diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/components/preferences/in-content/advanced.xul
+--- a/browser/components/preferences/in-content/advanced.xul
++++ b/browser/components/preferences/in-content/advanced.xul
+@@ -124,11 +124,6 @@
+   <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
+ #endif
+ 
+-<hbox class="heading" data-category="paneAdvanced" hidden="true">
+-  <image class="preference-icon" type="advanced"/>
+-  <html:h1>&paneAdvanced.title;</html:h1>
+-</hbox>
+-
+ <tabbox id="advancedPrefs" flex="1"
+         data-category="paneAdvanced" hidden="true"
+         onselect="gAdvancedPane.tabSelectionChanged();">
+diff --git a/browser/components/preferences/in-content/applications.xul b/browser/components/preferences/in-content/applications.xul
+--- a/browser/components/preferences/in-content/applications.xul
++++ b/browser/components/preferences/in-content/applications.xul
+@@ -55,11 +55,6 @@
+   <key key="&focusSearch2.key;" modifiers="accel" oncommand="gApplicationsPane.focusFilterBox();"/>
+ </keyset>
+ 
+-<hbox class="heading" data-category="paneApplications" hidden="true">
+-  <image class="preference-icon" type="applications"/>
+-  <html:h1>&paneApplications.title;</html:h1>
+-</hbox>
+-
+ <vbox data-category="paneApplications" hidden="true" flex="1">
+   <hbox>
+     <textbox id="filter" flex="1"
+diff --git a/browser/components/preferences/in-content/content.xul b/browser/components/preferences/in-content/content.xul
+--- a/browser/components/preferences/in-content/content.xul
++++ b/browser/components/preferences/in-content/content.xul
+@@ -33,11 +33,6 @@
+ <script type="application/javascript" 
+         src="chrome://browser/content/preferences/in-content/content.js"/>
+ 
+-<hbox class="heading" data-category="paneContent" hidden="true">
+-  <image class="preference-icon" type="content"/>
+-  <html:h1>&paneContent.title;</html:h1>
+-</hbox>
+-
+ <groupbox id="miscGroup" data-category="paneContent" hidden="true">
+   <grid id="contentGrid">
+     <columns>
+@@ -162,4 +157,4 @@
+             accesskey="&chooseButton.accesskey;"
+             oncommand="gContentPane.showLanguages();"/>
+   </hbox>
+-</groupbox>
+\ No newline at end of file
++</groupbox>
+diff --git a/browser/components/preferences/in-content/main.xul b/browser/components/preferences/in-content/main.xul
+--- a/browser/components/preferences/in-content/main.xul
++++ b/browser/components/preferences/in-content/main.xul
+@@ -55,11 +55,6 @@
+ 
+ </preferences>
+ 
+-<hbox class="heading" data-category="paneGeneral" hidden="true">
+-  <image class="preference-icon" type="general"/>
+-  <html:h1>&paneGeneral.title;</html:h1>
+-</hbox>
+-
+ <!-- Startup -->
+ <groupbox id="startupGroup" data-category="paneGeneral" hidden="true">
+   <caption label="&startup.label;"/>
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
@@ -722,6 +789,73 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +                  src="chrome://browser/locale/preferences/applicationManager.properties"/>
 +  </stringbundleset>  
  </page>
+diff --git a/browser/components/preferences/in-content/privacy.xul b/browser/components/preferences/in-content/privacy.xul
+--- a/browser/components/preferences/in-content/privacy.xul
++++ b/browser/components/preferences/in-content/privacy.xul
+@@ -66,11 +66,6 @@
+ 
+ </preferences>
+ 
+-<hbox class="heading" data-category="panePrivacy" hidden="true">
+-  <image class="preference-icon" type="privacy"/>
+-  <html:h1>&panePrivacy.title;</html:h1>
+-</hbox>
+-
+ <!-- Tracking -->
+ <groupbox id="trackingGroup" data-category="panePrivacy" hidden="true">
+   <caption label="&tracking.label;"/>
+@@ -220,4 +215,4 @@
+     </menulist>
+     <label>&locbar.post.label;</label>
+   </hbox>
+-</groupbox>
+\ No newline at end of file
++</groupbox>
+diff --git a/browser/components/preferences/in-content/security.xul b/browser/components/preferences/in-content/security.xul
+--- a/browser/components/preferences/in-content/security.xul
++++ b/browser/components/preferences/in-content/security.xul
+@@ -30,11 +30,6 @@
+ 
+ </preferences>
+ 
+-<hbox class="heading" data-category="paneSecurity" hidden="true">
+-  <image class="preference-icon" type="security"/>
+-  <html:h1>&paneSecurity.title;</html:h1>
+-</hbox>
+-
+ <!-- addons, forgery (phishing) UI -->
+ <groupbox id="addonsPhishingGroup" data-category="paneSecurity" hidden="true">
+   <hbox id="addonInstallBox">
+diff --git a/browser/components/preferences/in-content/sync.xul b/browser/components/preferences/in-content/sync.xul
+--- a/browser/components/preferences/in-content/sync.xul
++++ b/browser/components/preferences/in-content/sync.xul
+@@ -28,11 +28,6 @@
+ <script type="application/javascript"
+         src="chrome://browser/content/sync/utils.js"/>
+ 
+-<hbox class="heading" data-category="paneSync" hidden="true">
+-  <image class="preference-icon" type="sync"/>
+-  <html:h1>&paneSync.title;</html:h1>
+-</hbox>
+-
+ <deck id="weavePrefsDeck" data-category="paneSync" hidden="true">
+   <vbox id="noAccount" align="center">
+     <spacer flex="1"/>
+diff --git a/browser/components/preferences/in-content/tabs.xul b/browser/components/preferences/in-content/tabs.xul
+--- a/browser/components/preferences/in-content/tabs.xul
++++ b/browser/components/preferences/in-content/tabs.xul
+@@ -30,11 +30,6 @@
+ #endif
+ </preferences>
+ 
+-<hbox class="heading" data-category="paneTabs" hidden="true">
+-  <image class="preference-icon" type="tabs"/>
+-  <html:h1>&paneTabs.title;</html:h1>
+-</hbox>
+-
+ <checkbox id="linkTargeting" label="&newWindowsAsTabs.label;"
+           data-category="paneTabs" hidden="true"
+           accesskey="&newWindowsAsTabs.accesskey;"
 diff --git a/browser/themes/pinstripe/jar.mn b/browser/themes/pinstripe/jar.mn
 --- a/browser/themes/pinstripe/jar.mn
 +++ b/browser/themes/pinstripe/jar.mn
