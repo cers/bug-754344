@@ -5,7 +5,7 @@
 diff --git a/browser/components/preferences/in-content/preferences.xul b/browser/components/preferences/in-content/preferences.xul
 --- a/browser/components/preferences/in-content/preferences.xul
 +++ b/browser/components/preferences/in-content/preferences.xul
-@@ -1,25 +1,67 @@
+@@ -1,20 +1,63 @@
  <?xml version="1.0"?>
 -<!-- This Source Code Form is subject to the terms of the Mozilla Public
 -   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -51,6 +51,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -<?xml-stylesheet href="chrome://global/skin/global.css"?>
 +<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 +<?xml-stylesheet href="chrome://mozapps/content/extensions/extensions.css"?>
++<?xml-stylesheet href="chrome://mozapps/content/extensions.css"?>
 +<?xml-stylesheet href="chrome://mozapps/skin/extensions/extensions.css"?>
  
  <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
@@ -58,8 +59,10 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
  <?xml-stylesheet 
    href="chrome://browser/skin/preferences/in-content/preferences.css"?>
- <?xml-stylesheet 
-   href="chrome://browser/content/preferences/handlers.css"?>
+-<?xml-stylesheet 
+-  href="chrome://browser/content/preferences/handlers.css"?>
++<!--<?xml-stylesheet 
++  href="chrome://browser/content/preferences/handlers.css"?>-->
  <?xml-stylesheet href="chrome://browser/skin/preferences/applications.css"?>
  
 +
@@ -72,17 +75,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
  <!ENTITY % preferencesDTD SYSTEM 
    "chrome://browser/locale/preferences/preferences.dtd">
- <!ENTITY % privacyDTD SYSTEM "chrome://browser/locale/preferences/privacy.dtd">
- <!ENTITY % tabsDTD SYSTEM "chrome://browser/locale/preferences/tabs.dtd">
- <!ENTITY % syncBrandDTD SYSTEM "chrome://browser/locale/syncBrand.dtd">
- <!ENTITY % syncDTD SYSTEM "chrome://browser/locale/preferences/sync.dtd">
- <!ENTITY % securityDTD SYSTEM 
-@@ -49,24 +91,636 @@
- 
- #ifdef XP_WIN
- #define USE_WIN_TITLE_STYLE
- #endif
- #ifdef XP_OS2
+@@ -54,14 +97,202 @@
  #define USE_WIN_TITLE_STYLE
  #endif
  
@@ -100,7 +93,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -      title="&prefWindow.titleGNOME;">
 +      title="&prefWindow.titleGNOME;"
  #endif
-+     role="application" windowtype="Addons:Manager"
++     role="application" windowtype="Preferences:Manager"
 +      disablefastfind="true"
 +      onload="init_all();"
 +      ondragenter="gDragDrop.onDragOver(event)"
@@ -109,10 +102,10 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +      onkeypress="gHeader.onKeyPress(event)">
 +
 +  <xhtml:link rel="shortcut icon"
-+              href="chrome://mozapps/skin/extensions/extensionGeneric-16.png"/>
++              href="chrome://mozapps/skin/preferences/preferencesGeneric-16.png"/>
 +
-+  <script type="application/javascript"
-+          src="chrome://mozapps/content/extensions/extensions.js"/>
++  <!--<script type="application/javascript"
++          src="chrome://mozapps/content/extensions/extensions.js"/>-->
 +  <script type="application/javascript"
 +          src="chrome://global/content/contentAreaUtils.js"/>
 +
@@ -204,59 +197,10 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +  <!-- main header -->
 +  <hbox id="header" align="center">
 +    <toolbarbutton id="back-btn" class="nav-button header-button" command="cmd_back"
-+            tooltiptext="&cmd.back.tooltip;" hidden="true" disabled="true"/>
++            tooltiptext="&cmd.back.tooltip;"/>
 +    <toolbarbutton id="forward-btn" class="nav-button header-button" command="cmd_forward"
-+            tooltiptext="&cmd.forward.tooltip;" hidden="true" disabled="true"/>
++            tooltiptext="&cmd.forward.tooltip;"/>
 +    <spacer flex="1"/>
-+    <hbox id="updates-container" align="center">
-+      <image class="spinner"/>
-+      <label id="updates-noneFound" hidden="true"
-+             value="&updates.noneFound.label;"/>
-+      <button id="updates-manualUpdatesFound-btn" class="button-link"
-+              hidden="true" label="&updates.manualUpdatesFound.label;"
-+              command="cmd_goToAvailableUpdates"/>
-+      <label id="updates-progress" hidden="true"
-+             value="&updates.updating.label;"/>
-+      <label id="updates-installed" hidden="true"
-+             value="&updates.installed.label;"/>
-+      <label id="updates-downloaded" hidden="true"
-+             value="&updates.downloaded.label;"/>
-+      <button id="updates-restart-btn" class="button-link" hidden="true"
-+              label="&updates.restart.label;"
-+              command="cmd_restartApp"/>
-+    </hbox>
-+    <toolbarbutton id="header-utils-btn" class="header-button" type="menu"
-+            tooltiptext="&toolsMenu.tooltip;">
-+      <menupopup id="utils-menu">
-+        <menuitem id="utils-updateNow"
-+                  label="&updates.checkForUpdates.label;"
-+                  accesskey="&updates.checkForUpdates.accesskey;"
-+                  command="cmd_findAllUpdates"/>
-+        <menuitem id="utils-viewUpdates"
-+                  label="&updates.viewUpdates.label;"
-+                  accesskey="&updates.viewUpdates.accesskey;"
-+                  command="cmd_goToRecentUpdates"/>
-+        <menuseparator id="utils-installFromFile-separator"/>
-+        <menuitem id="utils-installFromFile"
-+                  label="&installAddonFromFile.label;"
-+                  accesskey="&installAddonFromFile.accesskey;"
-+                  command="cmd_installFromFile"/>
-+        <menuseparator/>
-+        <menuitem id="utils-autoUpdateDefault"
-+                  label="&updates.updateAddonsAutomatically.label;"
-+                  accesskey="&updates.updateAddonsAutomatically.accesskey;"
-+                  type="checkbox" autocheck="false"
-+                  command="cmd_toggleAutoUpdateDefault"/>
-+        <menuitem id="utils-resetAddonUpdatesToAutomatic"
-+                  label="&updates.resetUpdatesToAutomatic.label;"
-+                  accesskey="&updates.resetUpdatesToAutomatic.accesskey;"
-+                  command="cmd_resetAddonAutoUpdate"/>
-+        <menuitem id="utils-resetAddonUpdatesToManual"
-+                  label="&updates.resetUpdatesToManual.label;"
-+                  accesskey="&updates.resetUpdatesToManual.accesskey;"
-+                  command="cmd_resetAddonAutoUpdate"/>
-+      </menupopup>
-+    </toolbarbutton>
 +    <textbox id="header-search" type="search" searchbutton="true"
 +             placeholder="&search.placeholder;"/>
 +  </hbox>
@@ -265,7 +209,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +
 +    <!-- category list -->
 +    <richlistbox id="categories">
-+      <richlistitem id="category-search" value="addons://search/"
++      <!--<richlistitem id="category-search" value="addons://search/"
 +                    class="category"
 +                    name="&view.search.label;" priority="0"
 +                    tooltiptext="&view.search.label;" disabled="true"/>
@@ -281,432 +225,57 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +      <richlistitem id="category-recentUpdates" value="addons://updates/recent"
 +                    class="category"
 +                    name="&view.recentUpdates.label;" priority="101000"
-+                    tooltiptext="&view.recentUpdates.label;" disabled="true"/>
++                    tooltiptext="&view.recentUpdates.label;" disabled="true"/>-->
++      <richlistitem id="category-general" value="preferences://general"
++                    class="category"
++                    name="&paneGeneral.title;" priority="102000"
++                    tooltiptext="&paneGeneral.title;"/>
++      <richlistitem id="category-tabs" value="preferences://tabs"
++                    class="category"
++                    name="&paneTabs.title;" priority="102000"
++                    tooltiptext="&paneTabs.title;"/>
++      <richlistitem id="category-content" value="preferences://content"
++                    class="category"
++                    name="&paneContent.title;" priority="102000"
++                    tooltiptext="&paneContent.title;"/>
++      <richlistitem id="category-applications" value="preferences://applications"
++                    class="category"
++                    name="&paneApplications.title;" priority="102000"
++                    tooltiptext="&paneApplications.title;"/>
++      <richlistitem id="category-privacy" value="preferences://Privacy"
++                    class="category"
++                    name="&panePrivacy.title;" priority="102000"
++                    tooltiptext="&panePrivacy.title;"/>
++      <richlistitem id="category-security" value="preferences://security"
++                    class="category"
++                    name="&paneSecurity.title;" priority="102000"
++                    tooltiptext="&paneSecurity.title;"/>
++      <richlistitem id="category-sync" value="preferences://sync"
++                    class="category"
++                    name="&paneSync.title;" priority="102000"
++                    tooltiptext="&paneSync.title;"/>
++      <richlistitem id="category-advanced" value="preferences://advanced"
++                    class="category"
++                    name="&paneAdvanced.title;" priority="102000"
++                    tooltiptext="&paneAdvanced.title;"/>
 +    </richlistbox>
 +
 +    <box id="view-port-container" class="main-content" flex="1">
 +
 +      <!-- view port -->
 +      <deck id="view-port" flex="1" selectedIndex="0">
-+
-+        <!-- discover view -->
-+        <deck id="discover-view" flex="1" class="view-pane" selectedIndex="0" tabindex="0">
-+          <vbox id="discover-loading" align="center" pack="stretch" flex="1" class="alert-container">
-+            <spacer class="alert-spacer-before"/>
-+            <hbox class="alert loading" align="center">
-+              <image/>
-+              <label value="&loading.label;"/>
-+            </hbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <vbox id="discover-error" align="center" pack="stretch" flex="1" class="alert-container">
-+            <spacer class="alert-spacer-before"/>
-+            <hbox>
-+              <spacer class="discover-spacer-before"/>
-+              <hbox class="alert" align="center">
-+                <image class="discover-logo"/>
-+                <vbox flex="1" align="stretch">
-+                  <label class="discover-title">&discover.title;</label>
-+                  <description class="discover-description">&discover.description2;</description>
-+                  <description class="discover-footer">&discover.footer;</description>
-+                </vbox>
-+              </hbox>
-+              <spacer class="discover-spacer-after"/>
-+            </hbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <browser id="discover-browser" type="content" flex="1"
-+                   disablehistory="true" homepage="about:blank"/>
-+        </deck>
-+
-+        <!-- search view -->
-+        <vbox id="search-view" flex="1" class="view-pane" tabindex="0">
-+          <hbox class="view-header global-warning-container" align="center">
-+            <!-- global warnings -->
-+            <hbox class="global-warning" flex="1">
-+              <hbox class="global-warning-safemode" flex="1" align="center"
-+                    tooltiptext="&warning.safemode.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.safemode.label;"/>
-+              </hbox>
-+              <hbox class="global-warning-checkcompatibility" flex="1" align="center"
-+                    tooltiptext="&warning.checkcompatibility.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.checkcompatibility.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-checkcompatibility"
-+                      label="&warning.checkcompatibility.enable.label;"
-+                      tooltiptext="&warning.checkcompatibility.enable.tooltip;"
-+                      command="cmd_enableCheckCompatibility"/>
-+              <hbox class="global-warning-updatesecurity" flex="1" align="center"
-+                    tooltiptext="&warning.updatesecurity.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.updatesecurity.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-updatesecurity"
-+                      label="&warning.updatesecurity.enable.label;"
-+                      tooltiptext="&warning.updatesecurity.enable.tooltip;"
-+                      command="cmd_enableUpdateSecurity"/>
-+              <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+            </hbox>
-+            <spacer flex="1"/>
-+            <hbox id="search-sorters" class="sort-controls"
-+                  showrelevance="true" sortby="relevancescore" ascending="false"/>
-+          </hbox>
-+          <hbox id="search-filter" align="center">
-+            <label id="search-filter-label" value="&search.filter2.label;"/>
-+            <radiogroup id="search-filter-radiogroup" orient="horizontal"
-+                        align="center" persist="value" value="remote">
-+              <radio id="search-filter-local" class="search-filter-radio"
-+                     label="&search.filter2.installed.label;" value="local"
-+                     tooltiptext="&search.filter2.installed.tooltip;"/>
-+              <radio id="search-filter-remote" class="search-filter-radio"
-+                     label="&search.filter2.available.label;" value="remote"
-+                     tooltiptext="&search.filter2.available.tooltip;"/>
-+            </radiogroup>
-+          </hbox>
-+          <vbox id="search-loading" class="alert-container"
-+                flex="1" hidden="true">
-+            <spacer class="alert-spacer-before"/>
-+            <hbox class="alert loading" align="center">
-+              <image/>
-+              <label value="&loading.label;"/>
-+            </hbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <vbox id="search-list-empty" class="alert-container"
-+                flex="1" hidden="true">
-+            <spacer class="alert-spacer-before"/>
-+            <vbox class="alert">
-+              <label value="&listEmpty.search.label;"/>
-+              <button label="&listEmpty.button.label;"
-+                      command="cmd_goToDiscoverPane"/>
-+            </vbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <richlistbox id="search-list" class="list" flex="1">
-+            <hbox pack="center">
-+              <label id="search-allresults-link" class="text-link"/>
-+            </hbox>
-+          </richlistbox>
-+        </vbox>
-+
-+        <!-- list view -->
-+        <vbox id="list-view" flex="1" class="view-pane" align="stretch" tabindex="0">
-+          <hbox class="view-header global-warning-container">
-+            <!-- global warnings -->
-+            <hbox class="global-warning" flex="1">
-+              <hbox class="global-warning-safemode" flex="1" align="center"
-+                    tooltiptext="&warning.safemode.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.safemode.label;"/>
-+              </hbox>
-+              <hbox class="global-warning-checkcompatibility" flex="1" align="center"
-+                    tooltiptext="&warning.checkcompatibility.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.checkcompatibility.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-checkcompatibility"
-+                      label="&warning.checkcompatibility.enable.label;"
-+                      tooltiptext="&warning.checkcompatibility.enable.tooltip;"
-+                      command="cmd_enableCheckCompatibility"/>
-+              <hbox class="global-warning-updatesecurity" flex="1" align="center"
-+                    tooltiptext="&warning.updatesecurity.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.updatesecurity.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-updatesecurity"
-+                      label="&warning.updatesecurity.enable.label;"
-+                      tooltiptext="&warning.updatesecurity.enable.tooltip;"
-+                      command="cmd_enableUpdateSecurity"/>
-+              <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+            </hbox>
-+          </hbox>
-+          <hbox class="view-header global-info-container">
-+            <hbox class="global-info" flex="1" align="center">
-+              <button class="button-link global-info-plugincheck"
-+                      label="&info.plugincheck.label;"
-+                      tooltiptext="&info.plugincheck.tooltip;"
-+                      command="cmd_pluginCheck"/>
-+              <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+            </hbox>
-+          </hbox>
-+          <vbox id="addon-list-empty" class="alert-container"
-+                flex="1" hidden="true">
-+            <spacer class="alert-spacer-before"/>
-+            <vbox class="alert">
-+              <label value="&listEmpty.installed.label;"/>
-+              <button label="&listEmpty.button.label;"
-+                      command="cmd_goToDiscoverPane"/>
-+            </vbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <richlistbox id="addon-list" class="list" flex="1"/>
-+        </vbox>
-+
-+        <!-- updates view -->
-+        <vbox id="updates-view" flex="1" class="view-pane" tabindex="0">
-+          <hbox class="view-header global-warning-container" align="center">
-+            <!-- global warnings -->
-+            <hbox class="global-warning" flex="1">
-+              <hbox class="global-warning-safemode" flex="1" align="center"
-+                    tooltiptext="&warning.safemode.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.safemode.label;"/>
-+              </hbox>
-+              <hbox class="global-warning-checkcompatibility" flex="1" align="center"
-+                    tooltiptext="&warning.checkcompatibility.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.checkcompatibility.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-checkcompatibility"
-+                      label="&warning.checkcompatibility.enable.label;"
-+                      tooltiptext="&warning.checkcompatibility.enable.tooltip;"
-+                      command="cmd_enableCheckCompatibility"/>
-+              <hbox class="global-warning-updatesecurity" flex="1" align="center"
-+                    tooltiptext="&warning.updatesecurity.label;">
-+                <image class="warning-icon"/>
-+                <label class="global-warning-text" flex="1" crop="end"
-+                       value="&warning.updatesecurity.label;"/>
-+              </hbox>
-+              <button class="button-link global-warning-updatesecurity"
-+                      label="&warning.updatesecurity.enable.label;"
-+                      tooltiptext="&warning.updatesecurity.enable.tooltip;"
-+                      command="cmd_enableUpdateSecurity"/>
-+              <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+            </hbox>
-+            <spacer flex="1"/>
-+            <hbox id="updates-sorters" class="sort-controls" sortby="updateDate"
-+                  ascending="false"/>
-+          </hbox>
-+          <vbox id="updates-list-empty" class="alert-container"
-+                flex="1" hidden="true">
-+            <spacer class="alert-spacer-before"/>
-+            <vbox class="alert">
-+              <label id="empty-availableUpdates-msg" value="&listEmpty.availableUpdates.label;"/>
-+              <label id="empty-recentUpdates-msg" value="&listEmpty.recentUpdates.label;"/>
-+              <button label="&listEmpty.findUpdates.label;"
-+                      command="cmd_findAllUpdates"/>
-+            </vbox>
-+            <spacer class="alert-spacer-after"/>
-+          </vbox>
-+          <hbox id="update-actions" pack="center">
-+            <button id="update-selected-btn" hidden="true"
-+                    label="&updates.updateSelected.label;"
-+                    tooltiptext="&updates.updateSelected.tooltip;"/>
-+          </hbox>
-+          <richlistbox id="updates-list" class="list" flex="1"/>
-+        </vbox>
-+
-+        <!-- detail view -->
-+        <scrollbox id="detail-view" flex="1" class="view-pane addon-view" orient="vertical" tabindex="0">
-+          <!-- global warnings -->
-+          <hbox class="global-warning-container global-warning">
-+            <hbox class="global-warning-safemode" flex="1" align="center"
-+                  tooltiptext="&warning.safemode.label;">
-+              <image class="warning-icon"/>
-+              <label class="global-warning-text" flex="1" crop="end"
-+                     value="&warning.safemode.label;"/>
-+            </hbox>
-+            <hbox class="global-warning-checkcompatibility" flex="1" align="center"
-+                  tooltiptext="&warning.checkcompatibility.label;">
-+              <image class="warning-icon"/>
-+              <label class="global-warning-text" flex="1" crop="end"
-+                     value="&warning.checkcompatibility.label;"/>
-+            </hbox>
-+            <button class="button-link global-warning-checkcompatibility"
-+                    label="&warning.checkcompatibility.enable.label;"
-+                    tooltiptext="&warning.checkcompatibility.enable.tooltip;"
-+                    command="cmd_enableCheckCompatibility"/>
-+            <hbox class="global-warning-updatesecurity" flex="1" align="center"
-+                  tooltiptext="&warning.updatesecurity.label;">
-+              <image class="warning-icon"/>
-+              <label class="global-warning-text" flex="1" crop="end"
-+                     value="&warning.updatesecurity.label;"/>
-+            </hbox>
-+            <button class="button-link global-warning-updatesecurity"
-+                    label="&warning.updatesecurity.enable.label;"
-+                    tooltiptext="&warning.updatesecurity.enable.tooltip;"
-+                    command="cmd_enableUpdateSecurity"/>
-+            <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+          </hbox>
-+          <hbox flex="1">
-+            <spacer flex="1"/>
-+            <!-- "loading" splash screen -->
-+            <vbox class="alert-container">
-+              <spacer class="alert-spacer-before"/>
-+              <hbox class="alert loading">
-+                <image/>
-+                <label value="&loading.label;"/>
-+              </hbox>
-+              <spacer class="alert-spacer-after"/>
-+            </vbox>
-+            <!-- actual detail view -->
-+            <vbox class="detail-view-container" flex="3" contextmenu="addonitem-popup">
-+              <vbox id="detail-notifications">
-+                <hbox id="warning-container" align="center" class="warning">
-+                  <image class="warning-icon"/>
-+                  <label id="detail-warning" flex="1"/>
-+                  <label id="detail-warning-link" class="text-link"/>
-+                  <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+                </hbox>
-+                <hbox id="error-container" align="center" class="error">
-+                  <image class="error-icon"/>
-+                  <label id="detail-error" flex="1"/>
-+                  <label id="detail-error-link" class="text-link"/>
-+                  <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+                </hbox>
-+                <hbox id="pending-container" align="center" class="pending">
-+                  <image class="pending-icon"/>
-+                  <label id="detail-pending" flex="1"/>
-+                  <button id="detail-restart-btn" class="button-link"
-+                          label="&addon.restartNow.label;"
-+                          command="cmd_restartApp"/>
-+                  <button id="detail-undo-btn" class="button-link"
-+                          label="&addon.undoAction.label;"
-+                          tooltipText="&addon.undoAction.tooltip;"
-+                          command="cmd_cancelOperation"/>
-+                  <spacer flex="5000"/> <!-- Necessary to allow the message to wrap -->
-+                </hbox>
-+              </vbox>
-+              <hbox align="start">
-+                <vbox id="detail-icon-container" align="end">
-+                  <image id="detail-icon" class="icon"/>
-+                </vbox>
-+                <vbox flex="1">
-+                  <vbox id="detail-summary">
-+                    <hbox id="detail-name-container" class="name-container"
-+                          align="start">
-+                      <label id="detail-name" flex="1"/>
-+                      <label id="detail-version"/>
-+                      <label class="disabled-postfix" value="&addon.disabled.postfix;"/>
-+                      <label class="update-postfix" value="&addon.update.postfix;"/>
-+                      <spacer flex="5000"/> <!-- Necessary to allow the name to wrap -->
-+                    </hbox>
-+                    <label id="detail-creator" class="creator"/>
-+                  </vbox>
-+                  <hbox id="detail-desc-container" align="start">
-+                    <vbox pack="center"> <!-- Necessary to work around bug 394738 -->
-+                      <image id="detail-screenshot" hidden="true"
-+                             onload="this.removeAttribute('loading');"
-+                             onerror="this.setAttribute('loading', 'error');"/>
-+                    </vbox>
-+                    <vbox flex="1">
-+                      <description id="detail-desc"/>
-+                      <description id="detail-fulldesc"/>
-+                    </vbox>
-+                  </hbox>
-+                  <vbox id="detail-contributions">
-+                    <description id="detail-contrib-description">
-+                      &detail.contributions.description;
-+                    </description>
-+                    <hbox align="center">
-+                      <label id="detail-contrib-suggested"/>
-+                      <spacer flex="1"/>
-+                      <button id="detail-contrib-btn"
-+                              label="&cmd.contribute.label;"
-+                              accesskey="&cmd.contribute.accesskey;"
-+                              tooltiptext="&cmd.contribute.tooltip;"
-+                              command="cmd_contribute"/>
-+                    </hbox>
-+                  </vbox>
-+                  <grid id="detail-grid">
-+                    <columns>
-+                       <column flex="1"/>
-+                       <column flex="2"/>
-+                    </columns>
-+                    <rows id="detail-rows">
-+                      <row class="detail-row-complex" id="detail-updates-row">
-+                        <label class="detail-row-label" value="&detail.updateType;"/>
-+                        <hbox align="center">
-+                          <radiogroup id="detail-autoUpdate" orient="horizontal">
-+                            <!-- The values here need to match the values of
-+                                 AddonManager.AUTOUPDATE_* -->
-+                            <radio label="&detail.updateDefault.label;"
-+                                   tooltiptext="&detail.updateDefault.tooltip;"
-+                                   value="1"/>
-+                            <radio label="&detail.updateAutomatic.label;"
-+                                   tooltiptext="&detail.updateAutomatic.tooltip;"
-+                                   value="2"/>
-+                            <radio label="&detail.updateManual.label;"
-+                                   tooltiptext="&detail.updateManual.tooltip;"
-+                                   value="0"/>
-+                          </radiogroup>
-+                          <button id="detail-findUpdates-btn" class="button-link"
-+                                  label="&detail.checkForUpdates.label;"
-+                                  accesskey="&detail.checkForUpdates.accesskey;"
-+                                  tooltiptext="&detail.checkForUpdates.tooltip;"
-+                                  command="cmd_findItemUpdates"/>
-+                        </hbox>
-+                      </row>
-+                      <row class="detail-row" id="detail-dateUpdated" label="&detail.lastupdated.label;"/>
-+                      <row class="detail-row-complex" id="detail-homepage-row" label="&detail.home;">
-+                        <label class="detail-row-label" value="&detail.home;"/>
-+                        <label id="detail-homepage" class="detail-row-value text-link" crop="end"/>
-+                      </row>
-+                      <row class="detail-row-complex" id="detail-repository-row" label="&detail.repository;">
-+                        <label class="detail-row-label" value="&detail.repository;"/>
-+                        <label id="detail-repository" class="detail-row-value text-link"/>
-+                      </row>
-+                      <row class="detail-row" id="detail-size" label="&detail.size;"/>
-+                      <row class="detail-row-complex" id="detail-rating-row">
-+                        <label class="detail-row-label" value="&rating2.label;"/>
-+                        <hbox>
-+                          <label id="detail-rating" class="meta-value meta-rating"
-+                                 showrating="average"/>
-+                          <label id="detail-reviews" class="text-link"/>
-+                        </hbox>
-+                      </row>
-+                      <row class="detail-row" id="detail-downloads" label="&detail.numberOfDownloads.label;"/>
-+                    </rows>
-+                  </grid>
-+                  <hbox id="detail-controls">
-+                    <button id="detail-prefs-btn" class="addon-control preferences"
-+#ifdef XP_WIN
-+                            label="&detail.showPreferencesWin.label;"
-+                            accesskey="&detail.showPreferencesWin.accesskey;"
-+                            tooltiptext="&detail.showPreferencesWin.tooltip;"
-+#else
-+                            label="&detail.showPreferencesUnix.label;"
-+                            accesskey="&detail.showPreferencesUnix.accesskey;"
-+                            tooltiptext="&detail.showPreferencesUnix.tooltip;"
++        <prefpane flex="1" id="mainPrefPane">
++#include main.xul
++#include tabs.xul
++#include privacy.xul
++#include advanced.xul
++#include applications.xul
++#include content.xul
++#include security.xul
++#ifdef MOZ_SERVICES_SYNC
++#include sync.xul
 +#endif
-+                            command="cmd_showItemPreferences"/>
-+                    <spacer flex="1"/>
-+                    <button id="detail-enable-btn" class="addon-control enable"
-+                            label="&cmd.enableAddon.label;"
-+                            accesskey="&cmd.enableAddon.accesskey;"
-+                            command="cmd_enableItem"/>
-+                    <button id="detail-disable-btn" class="addon-control disable"
-+                            label="&cmd.disableAddon.label;"
-+                            accesskey="&cmd.disableAddon.accesskey;"
-+                            command="cmd_disableItem"/>
-+                    <button id="detail-uninstall-btn" class="addon-control remove"
-+                            label="&cmd.uninstallAddon.label;"
-+                            accesskey="&cmd.uninstallAddon.accesskey;"
-+                            command="cmd_uninstallItem"/>
-+                    <button id="detail-purchase-btn" class="addon-control purchase"
-+                            command="cmd_purchaseItem"/>
-+                    <button id="detail-install-btn" class="addon-control install"
-+                            label="&cmd.installAddon.label;"
-+                            accesskey="&cmd.installAddon.accesskey;"
-+                            command="cmd_installItem"/>
-+                  </hbox>
-+                </vbox>
-+              </hbox>
-+            </vbox>
-+            <spacer flex="1"/>
-+          </hbox>
-+        </scrollbox>
-+
++        </prefpane>
 +      </deck>
 +
 +    </box>
@@ -714,19 +283,487 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  
    <script type="application/javascript"
            src="chrome://browser/content/utilityOverlay.js"/>
-   <script type="application/javascript"
-           src="chrome://browser/content/preferences/in-content/preferences.js"/>
- 
-   <stringbundle id="bundleBrand" 
-                 src="chrome://branding/locale/brand.properties"/>
-@@ -97,10 +751,9 @@
- #include applications.xul
- #include content.xul
- #include security.xul
- #ifdef MOZ_SERVICES_SYNC
- #include sync.xul
- #endif
-     </prefpane>
-   </hbox>
+@@ -76,31 +307,5 @@
+   <stringbundleset id="appManagerBundleset">
+     <stringbundle id="appManagerBundle"
+                   src="chrome://browser/locale/preferences/applicationManager.properties"/>
+-  </stringbundleset>
+-
+-  <hbox id="header">
+-    <toolbarbutton id="back-btn" class="nav-button header-button"
+-                   oncommand="cmd_back()" tooltiptext="&buttonBack.tooltip;"
+-                   disabled="true"/>
+-    <toolbarbutton id="forward-btn" class="nav-button header-button"
+-                   oncommand="cmd_forward()" tooltiptext="&buttonForward.tooltip;"
+-                   disabled="true"/>
+-  </hbox>
 -  
+-  <hbox class="main-content" flex="1">
+-    <prefpane flex="1" id="mainPrefPane">
+-#include landing.xul
+-#include main.xul
+-#include tabs.xul
+-#include privacy.xul
+-#include advanced.xul
+-#include applications.xul
+-#include content.xul
+-#include security.xul
+-#ifdef MOZ_SERVICES_SYNC
+-#include sync.xul
+-#endif
+-    </prefpane>
+-  </hbox>
+-  
++  </stringbundleset>  
  </page>
+diff --git a/browser/themes/pinstripe/jar.mn b/browser/themes/pinstripe/jar.mn
+--- a/browser/themes/pinstripe/jar.mn
++++ b/browser/themes/pinstripe/jar.mn
+@@ -99,6 +99,14 @@
+   skin/classic/browser/preferences/alwaysAsk.png            (preferences/alwaysAsk.png)
+   skin/classic/browser/preferences/application.png          (preferences/application.png)
+   skin/classic/browser/preferences/Options.png              (preferences/Options.png)
++  skin/classic/browser/preferences/prefs-general.png        (preferences/prefs-general.png)
++  skin/classic/browser/preferences/prefs-tabs.png           (preferences/prefs-tabs.png)
++  skin/classic/browser/preferences/prefs-content.png        (preferences/prefs-content.png)
++  skin/classic/browser/preferences/prefs-applications.png   (preferences/prefs-applications.png)
++  skin/classic/browser/preferences/prefs-privacy.png        (preferences/prefs-privacy.png)
++  skin/classic/browser/preferences/prefs-security.png       (preferences/prefs-security.png)
++  skin/classic/browser/preferences/prefs-sync.png           (preferences/prefs-sync.png)
++  skin/classic/browser/preferences/prefs-advanced.png       (preferences/prefs-advanced.png)
+ #ifdef MOZ_SERVICES_SYNC
+   skin/classic/browser/preferences/Options-sync.png         (preferences/Options-sync.png)
+ #endif
+diff --git a/browser/themes/pinstripe/preferences/in-content/preferences.css b/browser/themes/pinstripe/preferences/in-content/preferences.css
+--- a/browser/themes/pinstripe/preferences/in-content/preferences.css
++++ b/browser/themes/pinstripe/preferences/in-content/preferences.css
+@@ -47,6 +47,35 @@
+   margin: 0 20px;
+ }
+ 
++/*#category-search > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/Options.png");
++}*/
++
++#category-general > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-general.png");
++}
++#category-tabs > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-tabs.png");
++}
++#category-content > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-content.png");
++}
++#category-applications > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-applications.png");
++}
++#category-privacy > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-privacy.png");
++}
++#category-security > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-security.png");
++}
++#category-sync > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-sync.png");
++}
++#category-advanced > .category-icon {
++  list-style-image: url("chrome://browser/skin/preferences/prefs-advanced.png");
++}
++
+ .preference-icon[type="general"],
+ .landingButton-icon[type="general"] {
+   background-position: 0 0;
+diff --git a/browser/themes/pinstripe/preferences/prefs-advanced.png b/browser/themes/pinstripe/preferences/prefs-advanced.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..76f91a94b312dc35c8305514445591347b1d314f
+GIT binary patch
+literal 2649
+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
+Hu0mjf$r|BS
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-applications.png b/browser/themes/pinstripe/preferences/prefs-applications.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..f51819cb8b737ded1d9a040f4e52b6f1693302a1
+GIT binary patch
+literal 2063
+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
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-content.png b/browser/themes/pinstripe/preferences/prefs-content.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..c14b6779b49fffdfc055c468408866678bde4113
+GIT binary patch
+literal 1813
+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
+DId5M@
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-general.png b/browser/themes/pinstripe/preferences/prefs-general.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..c134ff6c9424f25840e46633f834b2d9856c9663
+GIT binary patch
+literal 1081
+zc$@(_1jhS`P)<h;3K|Lk000e1NJLTq001BW001Be1^@s6b9#F800001b5ch_0Itp)
+z=>Px#24YJ`L;(K){{a7>y{D4^000SaNLh0L01FcU01FcV0GgZ_00007bV*G`2iye?
+z03rw|en6!F001I%MObu0Z*6U5Zgc=ca%Ew3Wn>_CX>@2HM@dakAa8CUVIWOmV~41B
+zLjV8+i%CR5R9M69m%mQ)NEF3?j>q;mL}(i%pjaV_B=7(r=y(S@o`4GRC^R5}L<6E(
+ziKj@xOHhC!t%CTo5Q07S%y^sFN`m9$TM2#5Udi(HSTpy`z2_c#;D7tg=8X8Y!^6Wv
+z$8lDEGGLZvf1jP5odFg=jJ$KT)_<OyoE-VSACye|uK^1`NfLE@e0&19r2yhM_FUHu
+zqA2<nunfSgu~FY~9D*PS;yCt(08)V3=wxF|%@~6*hV%1tI-L&IT8uGRYYRWWCZDy|
+zW6#DIE-o(UbULJIn!g{5DJIcdYXR8Y+@#%Z&z;_Be!JbK)oKBdrs=n=jRDAa0I<8e
+zJ9m&Oe`jZ>@U_-xt)~OXQ(CLl<_hvFfN}tNhNl9s))oL9$0;S+-rgQLQG*~L3`4>&
+z<o5QqlB8*xRs+b1HEYL02ySj}czAdqiX!4T=JN6qtu?OePMw<*voZtow3_extgo-L
+zy1I%nhWGb(PESvHdU|4IWu>xIlQAaSaH`;pE+(Zc%4MxZDTTF`Uawa$z3j?4HWffw
+z`pZm8Ns=TerBF&S7z_Y-d3oXE<D;@|D>*RPA~}$Jr}>!g`zWP|q6n=u{eB<Ead>-s
+zqu1-vXf#Rz%xuFf%lQ2KL`qqdq|AKZXL)(KC|Q<exUS1!FyQ(5nYFdGqLU`qpD9FN
+zUtb6zDoYRqK_R_amZ6kF2!S!C=!!55O94z~pjK6aY3BR>nEorJ@H`J81X}BY6Vu92
+zS%O~ykSkk~B!wUeAxM&hEX!~lXJ%V}D}l9kCJ@i_h@yxniZI5|@Ar{XQm@wuf}mjg
+zBoC~$v%dxNm=J=;$46dYUrCaL`}=#Olr$O*>h(H8h^d>HDaB<>owTE)Bku0*=ytnA
+zQAD@f<>24|DJ2UF3j{$>n(kbV=hlHL+t}D(X=w?qHQU?Uc%Fxpk}wRBQkK?#CJ9F~
+zaCLP>tJPv_YpZmj#l=PH_4=56yRM7tx?`X7>+5Tp%_du0TeCATO2AgDMYGwQ$%R>(
+z(QG!0b>^00W6ac@|ElHd<ZG9ez#0Cf2G&{;$8nNnng0`K0;N=9trb83XuybJa35Gu
+zO7-{m_x}RC$-_&QWlqJR24IZxj^kt{<0;Sw7KVP}03jfU_dkX&#Yh0BBB(P3Kvn`S
+z0}Sv9`~yTlEQTkPba+?8jQpgTJpK9U=(pOxL=EzQZ_$2c00000NkvXXu0mjfposD-
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-privacy.png b/browser/themes/pinstripe/preferences/prefs-privacy.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..a3e904e053721e69f73d23ea3a443cab2eff38f2
+GIT binary patch
+literal 2302
+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
+Y@51_GoiXu#9RL6T07*qoM6N<$f=~Bi6951J
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-security.png b/browser/themes/pinstripe/preferences/prefs-security.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc251ba9b65dea5c100688163fc582a78cad322d
+GIT binary patch
+literal 1796
+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
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-sync.png b/browser/themes/pinstripe/preferences/prefs-sync.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..89901fb698c4a06792d6ae974489cb6b93ed3994
+GIT binary patch
+literal 3585
+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
+Ri`zeCrg#fniGfGtKLF0gMvMRe
+
+diff --git a/browser/themes/pinstripe/preferences/prefs-tabs.png b/browser/themes/pinstripe/preferences/prefs-tabs.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..b1822bde5b82ca1f91b7540cfef5adcea816ccee
+GIT binary patch
+literal 746
+zc$@+10u}v<P)<h;3K|Lk000e1NJLTq001BW001Be1^@s6b9#F800001b5ch_0Itp)
+z=>Px#24YJ`L;(K){{a7>y{D4^000SaNLh0L01FcU01FcV0GgZ_00007bV*G`2iye?
+z03tPT77Vli001I%MObu0Z*6U5Zgc=ca%Ew3Wn>_CX>@2HM@dakAa8CUVIWOmV~41B
+zLjV8*JV``BR9M69mQ8CDQ51%s8B>j!4izb4V}c2RE+S-+Zp=n-DY&-&4u6P0qgi$5
+z!kv4eLb3{h7^j2aq6D2Vw=v!i7v90?n2<zb6wC{U%ekDH_dOqX?!XpX{O@q=dJotG
+z?rw<p6YvH2n6n#q!Z3Wd$;`{;@{_cH8h{XDBjklb0bmy(5wN4RCZEsqCxuvIwAKJS
+z=^1zgJOpk7J0FI_7jYb~mE7|@D%I*s;2SUky1?tC0&jsna07U%v_>hlRsrfq*6)E=
+zz*pdNx&;$EnE)fD6!JF(TwGkx@AnDAkaD@q;o%|s`};{kBOpk}=VrY`+X{5MT|Cbt
+zj$;~)#zG&U*XvO#l^Bgi6pKZAy&kPrE9v_$aA%fFDWsJ6zK;+B-}jgDrIZ9gK&R88
+z(P%In4hez)DdpUj&aQw`C@G1eh+WSkilU`_fa1Xcl}d%Pvojvl>tGB@O7toMl-5Y4
+zsMqTlV{jaY>2$i#2dGr53<d+DDB?T}snu#orII0Btpb-es|1UDfLnWe95tI9HJd*Z
+zTCoB~2r)Ls`11y5Rk*H;5Mm6NWdy`0?e^*O<Kt)fe7>*_0h7r@oV44gKs@g@ymC(f
+zkAeHZ&3Pwf1!&;Xp8q#MxJZC&iGASuoS0Q$fGIGxLNr@!@h|?ArhUhr1ZRyr#+uH4
+zjB*)r7r18EoL$|NptQ{+Ns}d}tdSLwn~}Yf3DlW=C-aQSh?pfNo!}J_&J1#A&E;RJ
+c6@Lxi0mR@!nEg%qmjD0&07*qoM6N<$f_`&9Qvd(}
+
+diff --git a/toolkit/themes/pinstripe/mozapps/jar.mn b/toolkit/themes/pinstripe/mozapps/jar.mn
+--- a/toolkit/themes/pinstripe/mozapps/jar.mn
++++ b/toolkit/themes/pinstripe/mozapps/jar.mn
+@@ -50,6 +50,7 @@
+   skin/classic/mozapps/passwordmgr/key.png                        (passwordmgr/key.png)
+   skin/classic/mozapps/passwordmgr/key-16.png                     (passwordmgr/key-16.png)
+   skin/classic/mozapps/passwordmgr/key-64.png                     (passwordmgr/key-64.png)
++  skin/classic/mozapps/preferences/preferencesGeneric-16.png      (preferences/preferencesGeneric-16.png)
+   skin/classic/mozapps/plugins/contentPluginBlocked.png           (plugins/contentPluginBlocked.png)
+   skin/classic/mozapps/plugins/contentPluginCrashed.png           (plugins/contentPluginCrashed.png)
+   skin/classic/mozapps/plugins/contentPluginDisabled.png          (plugins/contentPluginDisabled.png)
+diff --git a/toolkit/themes/pinstripe/mozapps/preferences/preferencesGeneric-16.png b/toolkit/themes/pinstripe/mozapps/preferences/preferencesGeneric-16.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..cd126bba538cd34e6af0960b3f316bd1d818bc0e
+GIT binary patch
+literal 1026
+zc$@(O1pWJoP)<h;3K|Lk000e1NJLTq000mG000mO1^@s6AM^iV00001b5ch_0Itp)
+z=>Px#24YJ`L;(K){{a7>y{D4^000SaNLh0L01FcU01FcV0GgZ_00007bV*G`2iye?
+z04FMdY4rpE001I%MObu0Z*6U5Zgc=ca%Ew3Wn>_CX>@2HM@dakAa8CUVIWOmV~41B
+zLjV8+R7pfZR5;6RQfo|;XB2+kul?H6p*1!jLj#KQ&#Wb3Gh|Cfmu=yavTV~Se}=|P
+zO_v#1x%$IwZb(W219sUWQNvKj5=Al5ctba3f)Ot%a;=OdVEX~3By_!gUoU4rEQYu}
+z$&-`woSY{)7a#$X$%I$2ZTk*$WmWZo<=S8OALFx<68tan^WNsZ`~HVxmd2(o0O)@(
+zKwTFvMF8N?p>I3CF<03B(^OPcgu``~rF2E_y*^10W+j{Lr-7;G&fxgOWT4(+9qhf=
+zFa6s2TLi!g0NB6(E9B<p0<Axv0030g9Q<*!PXEr4dP^S>kv|Zi!NFm=b^8uIwm+q(
+z!=qGLReg6u*2Z^t?b>}D0Lsd0zyRQ*{DM!~f9bg7`^Ov2+K?rm5d?}xBgn|iWYg2r
+zn3|fRU@(kz>(ZGZ2vMa%DX*xgG!6~fugU=6@5xEW@X)Yg`{z6Ih=_4AhNNT-yK(Ce
+zX>{yaY?VeMUz`3q6g<yFQDU{VHFb9Tlam0z0l?P>%4)S*Z3+=Fuh)y@<dy7LORHn&
+zr$(LW%hK$gn>Qw-u_$voU5G>^rdhcvy|}p8ykwv$C@5&KG&Jn<xZN~2H%B8QBY5)Y
+zVJCnI0OJoI40MR12rxz<(2@GOy#~YkN0$t|&CN&4jfI6x1Tc!nnL;7Qdj>-ZfD`~J
+zc?QE53WWk{brMsll&sijY(913R5<|10igHp?>55+A08G%LDFiq%pV9+PEO97m#^J^
+z4#crGZH-bCLlh2$nb*6B)YLTZxMS3oxoQ22E9AVj)!5W%z2Xl9V%pVOna8t0OvWK?
+zO)6smBq>5ZzaJa}b2(k{B(;h&mzzJHb<bXr0l>_RFyZt0-)L!RJt&IdEWLh91^^a|
+z6GFidVzDUWIL6wJxBY2tw3-B$fHB9I_2m`z?AeR%?hB=hiwk`^-IlHMZg;f%!bSUn
+z+Z}c}r+ue8I)<E1XCzynol6w&>%ZS$T9{vmmpf>0KM4Tfc{TO)^qhT7t=63HI#;68
+z=_2#<ZrPc$r}YaS&sBfGKMMu|0oQL{2Y?qlNJLfQ&sl=<%#8KbDwT54@yyW%fD()Y
+w@Bxqj#IVdjwwyfA%Mv=r^Su1k`qKFS0#2}eLeD@=0RR9107*qoM6N<$f<BDb&;S4c
+
