@@ -32,6 +32,18 @@ diff --git a/browser/components/preferences/in-content/applications.xul b/browse
  <vbox data-category="paneApplications" hidden="true" flex="1">
    <hbox>
      <textbox id="filter" flex="1"
+diff --git a/browser/components/preferences/in-content/content.js b/browser/components/preferences/in-content/content.js
+--- a/browser/components/preferences/in-content/content.js
++++ b/browser/components/preferences/in-content/content.js
+@@ -185,6 +185,8 @@
+         if (prefs[i].fonttype)
+           FontBuilder.buildFontList(aLanguageGroup, prefs[i].fonttype, element);
+ 
++        if (!preference.setElementValue);// window.alert(i+" "+preference.id);
++        else
+         preference.setElementValue(element);
+       }
+     }
 diff --git a/browser/components/preferences/in-content/content.xul b/browser/components/preferences/in-content/content.xul
 --- a/browser/components/preferences/in-content/content.xul
 +++ b/browser/components/preferences/in-content/content.xul
@@ -72,10 +84,11 @@ diff --git a/browser/components/preferences/in-content/main.xul b/browser/compon
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
-@@ -13,8 +13,9 @@
+@@ -13,8 +13,10 @@
  Cu.import("resource://gre/modules/Services.jsm");
  
  function init_all() {
++  gHeader.initialize();
 +  gotoPref("paneGeneral");
    document.documentElement.instantApply = true;
 -  window.history.replaceState("landing", document.title);
@@ -83,141 +96,26 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
    window.addEventListener("popstate", onStatePopped, true);
    updateCommands();
    gMainPane.init();
-@@ -75,3 +76,403 @@
+@@ -47,6 +49,14 @@
+ }
+ 
+ function onStatePopped(aEvent) {
++  var id = "category-"+aEvent.state.slice(4).toLowerCase();
++  var item = document.getElementById(id);
++  if (item) {
++    var node = document.getElementById("categories");
++    node.suppressOnSelect = true;
++    node.selectedItem = item;
++    node.suppressOnSelect = false;
++  }
+   updateCommands();
+   search(aEvent.state, "data-category");
+ }
+@@ -75,3 +85,83 @@
      element.hidden = (attributeValue != aQuery);
    }
  }
 +
-+/**
-+ * A wrapper around the HTML5 session history service that allows the browser
-+ * back/forward controls to work within the manager
-+ */
-+var HTML5History = {
-+  get index() {
-+    return window.QueryInterface(Ci.nsIInterfaceRequestor)
-+                 .getInterface(Ci.nsIWebNavigation)
-+                 .sessionHistory.index;
-+  },
-+
-+  get canGoBack() {
-+    return window.QueryInterface(Ci.nsIInterfaceRequestor)
-+                 .getInterface(Ci.nsIWebNavigation)
-+                 .canGoBack;
-+  },
-+
-+  get canGoForward() {
-+    return window.QueryInterface(Ci.nsIInterfaceRequestor)
-+                 .getInterface(Ci.nsIWebNavigation)
-+                 .canGoForward;
-+  },
-+
-+  back: function() {
-+    window.history.back();
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  },
-+
-+  forward: function() {
-+    window.history.forward();
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  },
-+
-+  pushState: function(aState) {
-+    window.history.pushState(aState, document.title);
-+  },
-+
-+  replaceState: function(aState) {
-+    window.history.replaceState(aState, document.title);
-+  },
-+
-+  popState: function() {
-+    function onStatePopped(aEvent) {
-+      window.removeEventListener("popstate", onStatePopped, true);
-+      // TODO To ensure we can't go forward again we put an additional entry
-+      // for the current state into the history. Ideally we would just strip
-+      // the history but there doesn't seem to be a way to do that. Bug 590661
-+      window.history.pushState(aEvent.state, document.title);
-+    }
-+    window.addEventListener("popstate", onStatePopped, true);
-+    window.history.back();
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  }
-+};
-+
-+/**
-+ * A wrapper around a fake history service
-+ */
-+var FakeHistory = {
-+  pos: 0,
-+  states: [null],
-+
-+  get index() {
-+    return this.pos;
-+  },
-+
-+  get canGoBack() {
-+    return this.pos > 0;
-+  },
-+
-+  get canGoForward() {
-+    return (this.pos + 1) < this.states.length;
-+  },
-+
-+  back: function() {
-+    if (this.pos == 0)
-+      throw new Error("Cannot go back from this point");
-+
-+    this.pos--;
-+    gViewController.updateState(this.states[this.pos]);
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  },
-+
-+  forward: function() {
-+    if ((this.pos + 1) >= this.states.length)
-+      throw new Error("Cannot go forward from this point");
-+
-+    this.pos++;
-+    gViewController.updateState(this.states[this.pos]);
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  },
-+
-+  pushState: function(aState) {
-+    this.pos++;
-+    this.states.splice(this.pos, this.states.length);
-+    this.states.push(aState);
-+  },
-+
-+  replaceState: function(aState) {
-+    this.states[this.pos] = aState;
-+  },
-+
-+  popState: function() {
-+    if (this.pos == 0)
-+      throw new Error("Cannot popState from this view");
-+
-+    this.states.splice(this.pos, this.states.length);
-+    this.pos--;
-+
-+    gViewController.updateState(this.states[this.pos]);
-+    gViewController.updateCommand("cmd_back");
-+    gViewController.updateCommand("cmd_forward");
-+  }
-+};
-+
-+// If the window has a session history then use the HTML5 History wrapper
-+// otherwise use our fake history implementation
-+if (window.QueryInterface(Ci.nsIInterfaceRequestor)
-+          .getInterface(Ci.nsIWebNavigation)
-+          .sessionHistory) {
-+  var gHistory = HTML5History;
-+}
-+else {
-+  gHistory = FakeHistory;
-+}
 +
 +var gHeader = {
 +  _search: null,
@@ -297,200 +195,10 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +    this._search.value = aQuery;
 +  },
 +};
-+
-+var gViewController = {
-+  viewPort: null,
-+  currentViewId: "",
-+  currentViewObj: null,
-+  currentViewRequest: 0,
-+  viewObjects: {},
-+  viewChangeCallback: null,
-+  initialViewSelected: false,
-+  lastHistoryIndex: -1,
-+
-+  initialize: function() {
-+    this.viewPort = document.getElementById("view-port");
-+
-+/*    this.viewObjects["search"] = gSearchView;
-+    this.viewObjects["discover"] = gDiscoverView;
-+    this.viewObjects["list"] = gListView;
-+    this.viewObjects["detail"] = gDetailView;
-+    this.viewObjects["updates"] = gUpdatesView;*/
-+
-+    for each (let view in this.viewObjects)
-+      view.initialize();
-+
-+    window.controllers.appendController(this);
-+
-+    window.addEventListener("popstate",
-+                            function (e) {
-+                              gViewController.updateState(e.state);
-+                            },
-+                            false);
-+  },
-+
-+  shutdown: function() {
-+    if (this.currentViewObj)
-+      this.currentViewObj.hide();
-+    this.currentViewRequest = 0;
-+
-+    for each(let view in this.viewObjects) {
-+      if ("shutdown" in view) {
-+        try {
-+          view.shutdown();
-+        } catch(e) {
-+          // this shouldn't be fatal
-+          Cu.reportError(e);
-+        }
-+      }
-+    }
-+
-+    window.controllers.removeController(this);
-+  },
-+
-+  updateState: function(state) {
-+    try {
-+      this.loadViewInternal(state.view, state.previousView, state);
-+      this.lastHistoryIndex = gHistory.index;
-+    }
-+    catch (e) {
-+      // The attempt to load the view failed, try moving further along history
-+      if (this.lastHistoryIndex > gHistory.index) {
-+        if (gHistory.canGoBack)
-+          gHistory.back();
-+        else
-+          gViewController.replaceView(VIEW_DEFAULT);
-+      } else {
-+        if (gHistory.canGoForward)
-+          gHistory.forward();
-+        else
-+          gViewController.replaceView(VIEW_DEFAULT);
-+      }
-+    }
-+  },
-+
-+  /*parseViewId: function(aViewId) {
-+    var matchRegex = /^addons:\/\/([^\/]+)\/(.*)$/;
-+    var [,viewType, viewParam] = aViewId.match(matchRegex) || [];
-+    return {type: viewType, param: decodeURIComponent(viewParam)};
-+  },*/
-+
-+  get isLoading() {
-+    return !this.currentViewObj || this.currentViewObj.node.hasAttribute("loading");
-+  },
-+
-+  loadView: function(aViewId) {
-+    var isRefresh = false;
-+    if (aViewId == this.currentViewId) {
-+      if (this.isLoading)
-+        return;
-+      if (!("refresh" in this.currentViewObj))
-+        return;
-+      if (!this.currentViewObj.canRefresh())
-+        return;
-+      isRefresh = true;
-+    }
-+
-+    var state = {
-+      view: aViewId,
-+      previousView: this.currentViewId
-+    };
-+    if (!isRefresh) {
-+      gHistory.pushState(state);
-+      this.lastHistoryIndex = gHistory.index;
-+    }
-+    this.loadViewInternal(aViewId, this.currentViewId, state);
-+  },
-+
-+  // Replaces the existing view with a new one, rewriting the current history
-+  // entry to match.
-+  replaceView: function(aViewId) {
-+    if (aViewId == this.currentViewId)
-+      return;
-+
-+    var state = {
-+      view: aViewId,
-+      previousView: null
-+    };
-+    gHistory.replaceState(state);
-+    this.loadViewInternal(aViewId, null, state);
-+  },
-+
-+  loadInitialView: function(aViewId) {
-+    var state = {
-+      view: aViewId,
-+      previousView: null
-+    };
-+    gHistory.replaceState(state);
-+
-+    this.loadViewInternal(aViewId, null, state);
-+    this.initialViewSelected = true;
-+    notifyInitialized();
-+  },
-+
-+  loadViewInternal: function(aViewId, aPreviousView, aState) {
-+    var view = this.parseViewId(aViewId);
-+
-+    if (!view.type || !(view.type in this.viewObjects))
-+      throw new Error("Invalid view: " + view.type);
-+
-+    var viewObj = this.viewObjects[view.type];
-+    if (!viewObj.node)
-+      throw new Error("Root node doesn't exist for '" + view.type + "' view");
-+
-+    if (this.currentViewObj && aViewId != aPreviousView) {
-+      try {
-+        let canHide = this.currentViewObj.hide();
-+        if (canHide === false)
-+          return;
-+        this.viewPort.selectedPanel.removeAttribute("loading");
-+      } catch (e) {
-+        // this shouldn't be fatal
-+        Cu.reportError(e);
-+      }
-+    }
-+
-+    gCategories.select(aViewId, aPreviousView);
-+
-+    this.currentViewId = aViewId;
-+    this.currentViewObj = viewObj;
-+
-+    this.viewPort.selectedPanel = this.currentViewObj.node;
-+    this.viewPort.selectedPanel.setAttribute("loading", "true");
-+    this.currentViewObj.node.focus();
-+
-+    if (aViewId == aPreviousView)
-+      this.currentViewObj.refresh(view.param, ++this.currentViewRequest, aState);
-+    else
-+      this.currentViewObj.show(view.param, ++this.currentViewRequest, aState);
-+  },
-+
-+  // Moves back in the document history and removes the current history entry
-+  popState: function(aCallback) {
-+    this.viewChangeCallback = aCallback;
-+    gHistory.popState();
-+  },
-+
-+  notifyViewChanged: function() {
-+    this.viewPort.selectedPanel.removeAttribute("loading");
-+
-+    if (this.viewChangeCallback) {
-+      this.viewChangeCallback();
-+      this.viewChangeCallback = null;
-+    }
-+
-+    var event = document.createEvent("Events");
-+    event.initEvent("ViewChanged", true, true);
-+    this.currentViewObj.node.dispatchEvent(event);
-+  },
-+
-+  onEvent: function() {}
-+};
-+
 diff --git a/browser/components/preferences/in-content/preferences.xul b/browser/components/preferences/in-content/preferences.xul
 --- a/browser/components/preferences/in-content/preferences.xul
 +++ b/browser/components/preferences/in-content/preferences.xul
-@@ -1,20 +1,63 @@
+@@ -1,20 +1,61 @@
  <?xml version="1.0"?>
 -<!-- This Source Code Form is subject to the terms of the Mozilla Public
 -   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -546,8 +254,6 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
    href="chrome://browser/skin/preferences/in-content/preferences.css"?>
 -<?xml-stylesheet 
 -  href="chrome://browser/content/preferences/handlers.css"?>
-+<!--<?xml-stylesheet 
-+  href="chrome://browser/content/preferences/handlers.css"?>-->
  <?xml-stylesheet href="chrome://browser/skin/preferences/applications.css"?>
  
 +
@@ -560,7 +266,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
  <!ENTITY % preferencesDTD SYSTEM 
    "chrome://browser/locale/preferences/preferences.dtd">
-@@ -54,42 +97,182 @@
+@@ -54,42 +95,108 @@
  #define USE_WIN_TITLE_STYLE
  #endif
  
@@ -589,8 +295,6 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +  <xhtml:link rel="shortcut icon"
 +              href="chrome://mozapps/skin/preferences/preferencesGeneric-16.png"/>
 +
-+  <!--<script type="application/javascript"
-+          src="chrome://mozapps/content/extensions/extensions.js"/>-->
 +  <script type="application/javascript"
 +          src="chrome://global/content/contentAreaUtils.js"/>
    <script type="application/javascript"
@@ -602,47 +306,6 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -                src="chrome://branding/locale/brand.properties"/>
 -  <stringbundle id="bundlePreferences"
 -                src="chrome://browser/locale/preferences/preferences.properties"/>
-+  <popupset>
-+    <!-- menu for an addon item -->
-+    <menupopup id="addonitem-popup">
-+      <menuitem id="menuitem_showDetails" command="cmd_showItemDetails"
-+                default="true" label="&cmd.showDetails.label;"
-+                accesskey="&cmd.showDetails.accesskey;"/>
-+      <menuitem id="menuitem_enableItem" command="cmd_enableItem"
-+                label="&cmd.enableAddon.label;"
-+                accesskey="&cmd.enableAddon.accesskey;"/>
-+      <menuitem id="menuitem_disableItem" command="cmd_disableItem"
-+                label="&cmd.disableAddon.label;"
-+                accesskey="&cmd.disableAddon.accesskey;"/>
-+      <menuitem id="menuitem_enableTheme" command="cmd_enableItem"
-+                label="&cmd.enableTheme.label;"
-+                accesskey="&cmd.enableTheme.accesskey;"/>
-+      <menuitem id="menuitem_disableTheme" command="cmd_disableItem"
-+                label="&cmd.disableTheme.label;"
-+                accesskey="&cmd.disableTheme.accesskey;"/>
-+      <menuitem id="menuitem_installItem" command="cmd_installItem"
-+                label="&cmd.installAddon.label;"
-+                accesskey="&cmd.installAddon.accesskey;"/>
-+      <menuitem id="menuitem_uninstallItem" command="cmd_uninstallItem"
-+                label="&cmd.uninstallAddon.label;"
-+                accesskey="&cmd.uninstallAddon.accesskey;"/>
-+      <menuseparator id="addonitem-menuseparator" />
-+      <menuitem id="menuitem_preferences" command="cmd_showItemPreferences"
-+#ifdef XP_WIN
-+                label="&cmd.preferencesWin.label;"
-+                accesskey="&cmd.preferencesWin.accesskey;"/>
-+#else
-+                label="&cmd.preferencesUnix.label;"
-+                accesskey="&cmd.preferencesUnix.accesskey;"/>
-+#endif
-+      <menuitem id="menuitem_findUpdates" command="cmd_findItemUpdates"
-+                label="&cmd.findUpdates.label;"
-+                accesskey="&cmd.findUpdates.accesskey;"/>
-+      <menuitem id="menuitem_about" command="cmd_showItemAbout"
-+                label="&cmd.about.label;"
-+                accesskey="&cmd.about.accesskey;"/>
-+    </menupopup>
-+  </popupset>
  
 -  <stringbundleset id="appManagerBundleset">
 -    <stringbundle id="appManagerBundle"
@@ -650,21 +313,9 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -  </stringbundleset>
 +  <!-- global commands - these act on all addons, or affect the addons manager
 +       in some other way -->
-+  <commandset id="globalCommandSet"
-+              oncommand="gViewController.doCommand(event.target.id);">
-+    <command id="cmd_findAllUpdates"/>
-+    <command id="cmd_restartApp"/>
-+    <command id="cmd_goToDiscoverPane"/>
-+    <command id="cmd_goToRecentUpdates"/>
-+    <command id="cmd_goToAvailableUpdates"/>
-+    <command id="cmd_installFromFile"/>
-+    <command id="cmd_back"/>
-+    <command id="cmd_forward"/>
-+    <command id="cmd_enableCheckCompatibility"/>
-+    <command id="cmd_pluginCheck"/>
-+    <command id="cmd_enableUpdateSecurity"/>
-+    <command id="cmd_toggleAutoUpdateDefault"/>
-+    <command id="cmd_resetAddonAutoUpdate"/>
++  <commandset id="globalCommandSet">
++    <command id="cmd_back" oncommand="cmd_back()"/>
++    <command id="cmd_forward" oncommand="cmd_forward()"/>
 +  </commandset>
  
 -  <hbox id="header">
@@ -674,25 +325,6 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -    <toolbarbutton id="forward-btn" class="nav-button header-button"
 -                   oncommand="cmd_forward()" tooltiptext="&buttonForward.tooltip;"
 -                   disabled="true"/>
-+  <!-- view commands - these act on the selected addon -->
-+  <!--<commandset id="viewCommandSet"
-+              events="richlistbox-select" commandupdater="true"
-+              oncommandupdate="gViewController.updateCommands();"
-+              oncommand="gViewController.doCommand(event.target.id);">
-+    <command id="cmd_showItemDetails"/>
-+    <command id="cmd_findItemUpdates"/>
-+    <command id="cmd_showItemPreferences"/>
-+    <command id="cmd_showItemAbout"/>
-+    <command id="cmd_enableItem"/>
-+    <command id="cmd_disableItem"/>
-+    <command id="cmd_installItem"/>
-+    <command id="cmd_purchaseItem"/>
-+    <command id="cmd_uninstallItem"/>
-+    <command id="cmd_cancelUninstallItem"/>
-+    <command id="cmd_cancelOperation"/>
-+    <command id="cmd_contribute"/>
-+  </commandset>-->
-+
 +  <keyset>
 +    <key id="focusSearch" key="&search.commandkey;" modifiers="accel"
 +         oncommand="gHeader.focusSearchBox();"/>
@@ -767,7 +399,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  #include main.xul
  #include tabs.xul
  #include privacy.xul
-@@ -100,7 +283,19 @@
+@@ -100,7 +207,19 @@
  #ifdef MOZ_SERVICES_SYNC
  #include sync.xul
  #endif
