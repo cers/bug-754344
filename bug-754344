@@ -84,54 +84,170 @@ diff --git a/browser/components/preferences/in-content/main.xul b/browser/compon
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
-@@ -13,8 +13,10 @@
+@@ -12,66 +12,172 @@
+ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
  Cu.import("resource://gre/modules/Services.jsm");
  
- function init_all() {
-+  gHeader.initialize();
-+  gotoPref("paneGeneral");
-   document.documentElement.instantApply = true;
+-function init_all() {
+-  document.documentElement.instantApply = true;
 -  window.history.replaceState("landing", document.title);
-+  //window.history.replaceState("landing", document.title);
-   window.addEventListener("popstate", onStatePopped, true);
-   updateCommands();
-   gMainPane.init();
-@@ -47,6 +49,14 @@
+-  window.addEventListener("popstate", onStatePopped, true);
+-  updateCommands();
+-  gMainPane.init();
++var gPreferences = {
++  categories: null,
++  forwardButton: null,
++  backButton: null,
++  initialize: function gPreferences__initialize() {
++    this.categories = document.getElementById("categories");
++    this.backButton = document.getElementById("back-btn");
++    this.forwardButton = document.getElementById("forward-btn");
++    gHeader.initialize();
++    this.gotoPref("paneGeneral");
++    document.documentElement.instantApply = true;
++    window.addEventListener("popstate", this.onStatePopped, true);
++    this.updateCommands();
++    gMainPane.init();
+ #ifdef XP_WIN
+-  gTabsPane.init();
++    gTabsPane.init();
+ #endif
+-  gPrivacyPane.init();
+-  gAdvancedPane.init();
+-  gApplicationsPane.init();
+-  gContentPane.init();
+-  gSyncPane.init();
+-  gSecurityPane.init();
+-  var initFinished = document.createEvent("Event");
+-  initFinished.initEvent("Initialized", true, true);
+-  document.dispatchEvent(initFinished);
++    gPrivacyPane.init();
++    gAdvancedPane.init();
++    gApplicationsPane.init();
++    gContentPane.init();
++    gSyncPane.init();
++    gSecurityPane.init();
++    var initFinished = document.createEvent("Event");
++    initFinished.initEvent("Initialized", true, true);
++    document.dispatchEvent(initFinished);
++  },
++
++  gotoPref: function gPreferences__gotoPref(page) {
++    if (this.currentPage == page)
++      return;
++    this.search(page, "data-category");
++    window.history.pushState(page, document.title);
++    this.updateCommands();
++    this.currentPage = page;
++  },
++
++  commands: {
++    cmd_back: function gPreferences__cmd_back() {
++      window.history.back();
++    },
++    cmd_forward: function gPreferences__cmd_forward() {
++      window.history.forward();
++    }
++  },
++
++  doCommand: function gPreferences__doCommand(cmd) {
++    if (cmd in this.commands)
++      this.commands[cmd]();
++  },
++
++  onStatePopped: function gPreferences__onStatePopped(aEvent) {
++    var id = "category-"+aEvent.state.slice(4).toLowerCase();
++    var item = document.getElementById(id);
++    if (item) {
++      gPreferences.categories.suppressOnSelect = true;
++      gPreferences.categories.selectedItem = item;
++      gPreferences.categories.suppressOnSelect = false;
++    }
++    gPreferences.search(aEvent.state, "data-category");
++    gPreferences.currentPage = aEvent.state;
++    gPreferences.updateCommands();
++  },
++
++  updateCommands: function gPreferences__updateCommands() {
++    this.backButton.disabled = !this.canGoBack();
++    this.forwardButton.disabled = !this.canGoForward();
++  },
++
++  canGoBack: function gPreferences__canGoBack() {
++    return window.QueryInterface(Ci.nsIInterfaceRequestor)
++                 .getInterface(Ci.nsIWebNavigation)
++                 .canGoBack;
++  },
++
++  canGoForward: function gPreferences__canGoForward() {
++    return window.QueryInterface(Ci.nsIInterfaceRequestor)
++                 .getInterface(Ci.nsIWebNavigation)
++                 .canGoForward;
++  },
++
++  search: function gPreferences__search(aQuery, aAttribute) {
++    let elements = document.getElementById("mainPrefPane").children;
++    for (let element of elements) {
++      let attributeValue = element.getAttribute(aAttribute);
++      element.hidden = (attributeValue != aQuery);
++    }
++  }
  }
  
- function onStatePopped(aEvent) {
-+  var id = "category-"+aEvent.state.slice(4).toLowerCase();
-+  var item = document.getElementById(id);
-+  if (item) {
-+    var node = document.getElementById("categories");
-+    node.suppressOnSelect = true;
-+    node.selectedItem = item;
-+    node.suppressOnSelect = false;
-+  }
-   updateCommands();
-   search(aEvent.state, "data-category");
- }
-@@ -75,3 +85,83 @@
-     element.hidden = (attributeValue != aQuery);
-   }
- }
-+
-+
+-function gotoPref(page) {
+-  search(page, "data-category");
+-  window.history.pushState(page, document.title);
+-  updateCommands();
+-}
+- 
+-function cmd_back() {
+-  window.history.back();
+-}
+- 
+-function cmd_forward() {
+-  window.history.forward();
+-}
+ 
+-function onStatePopped(aEvent) {
+-  updateCommands();
+-  search(aEvent.state, "data-category");
+-}
 +var gHeader = {
 +  _search: null,
 +  _dest: "",
-+
+ 
+-function updateCommands() {
+-  document.getElementById("back-btn").disabled = !canGoBack();
+-  document.getElementById("forward-btn").disabled = !canGoForward();
+-}
 +  initialize: function() {
 +    this._search = document.getElementById("header-search");
-+
+ 
+-function canGoBack() {
+-  return window.QueryInterface(Ci.nsIInterfaceRequestor)
+-               .getInterface(Ci.nsIWebNavigation)
+-               .canGoBack;
+-}
 +    this._search.addEventListener("command", function(aEvent) {
 +      var query = aEvent.target.value;
 +      if (query.length == 0)
 +        return false;
-+
+ 
+-function canGoForward() {
+-  return window.QueryInterface(Ci.nsIInterfaceRequestor)
+-               .getInterface(Ci.nsIWebNavigation)
+-               .canGoForward;
+-}
 +      //gViewController.loadView("addons://search/" + encodeURIComponent(query));
 +    }, false);
-+
+ 
+-function search(aQuery, aAttribute) {
+-  let elements = document.getElementById("mainPrefPane").children;
+-  for (let element of elements) {
+-    let attributeValue = element.getAttribute(aAttribute);
+-    element.hidden = (attributeValue != aQuery);
+-  }
+-}
 +    function updateNavButtonVisibility() {
 +      var shouldShow = gHeader.shouldShowNavButtons;
 +      document.getElementById("back-btn").hidden = !shouldShow;
@@ -286,7 +402,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  #endif
 +     role="application" windowtype="Preferences:Manager"
 +      disablefastfind="true"
-+      onload="init_all();"
++      onload="gPreferences.initialize()"
 +      ondragenter="gDragDrop.onDragOver(event)"
 +      ondragover="gDragDrop.onDragOver(event)"
 +      ondrop="gDragDrop.onDrop(event)"
@@ -313,9 +429,9 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -  </stringbundleset>
 +  <!-- global commands - these act on all addons, or affect the addons manager
 +       in some other way -->
-+  <commandset id="globalCommandSet">
-+    <command id="cmd_back" oncommand="cmd_back()"/>
-+    <command id="cmd_forward" oncommand="cmd_forward()"/>
++  <commandset id="globalCommandSet" oncommand="gPreferences.doCommand(event.target.id)">
++    <command id="cmd_back"/><!-- oncommand="cmd_back()"/>-->
++    <command id="cmd_forward"/><!-- oncommand="cmd_forward()"/>-->
 +  </commandset>
  
 -  <hbox id="header">
@@ -353,42 +469,42 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +                    class="category"
 +                    name="&paneGeneral.title;" priority="102000"
 +                    tooltiptext="&paneGeneral.title;"
-+                    onclick="gotoPref('paneGeneral')"/>
++                    onclick="gPreferences.gotoPref('paneGeneral')"/>
 +      <richlistitem id="category-tabs" value="preferences://tabs"
 +                    class="category"
 +                    name="&paneTabs.title;" priority="102000"
 +                    tooltiptext="&paneTabs.title;"
-+                    onclick="gotoPref('paneTabs')"/>
++                    onclick="gPreferences.gotoPref('paneTabs')"/>
 +      <richlistitem id="category-content" value="preferences://content"
 +                    class="category"
 +                    name="&paneContent.title;" priority="102000"
 +                    tooltiptext="&paneContent.title;"
-+                    onclick="gotoPref('paneContent')"/>
++                    onclick="gPreferences.gotoPref('paneContent')"/>
 +      <richlistitem id="category-applications" value="preferences://applications"
 +                    class="category"
 +                    name="&paneApplications.title;" priority="102000"
 +                    tooltiptext="&paneApplications.title;"
-+                    onclick="gotoPref('paneApplications')"/>
++                    onclick="gPreferences.gotoPref('paneApplications')"/>
 +      <richlistitem id="category-privacy" value="preferences://Privacy"
 +                    class="category"
 +                    name="&panePrivacy.title;" priority="102000"
 +                    tooltiptext="&panePrivacy.title;"
-+                    onclick="gotoPref('panePrivacy')"/>
++                    onclick="gPreferences.gotoPref('panePrivacy')"/>
 +      <richlistitem id="category-security" value="preferences://security"
 +                    class="category"
 +                    name="&paneSecurity.title;" priority="102000"
 +                    tooltiptext="&paneSecurity.title;"
-+                    onclick="gotoPref('paneSecurity')"/>
++                    onclick="gPreferences.gotoPref('paneSecurity')"/>
 +      <richlistitem id="category-sync" value="preferences://sync"
 +                    class="category"
 +                    name="&paneSync.title;" priority="102000"
 +                    tooltiptext="&paneSync.title;"
-+                    onclick="gotoPref('paneSync')"/>
++                    onclick="gPreferences.gotoPref('paneSync')"/>
 +      <richlistitem id="category-advanced" value="preferences://advanced"
 +                    class="category"
 +                    name="&paneAdvanced.title;" priority="102000"
 +                    tooltiptext="&paneAdvanced.title;"
-+                    onclick="gotoPref('paneAdvanced')"/>
++                    onclick="gPreferences.gotoPref('paneAdvanced')"/>
 +    </richlistbox>
 +
 +    <box id="view-port-container" class="main-content" flex="1">
