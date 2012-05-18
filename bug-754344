@@ -42,41 +42,6 @@ diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/co
  <tabbox id="advancedPrefs" flex="1"
          data-category="paneAdvanced" hidden="true"
          onselect="gAdvancedPane.tabSelectionChanged();">
-diff --git a/browser/components/preferences/in-content/applications.js b/browser/components/preferences/in-content/applications.js
---- a/browser/components/preferences/in-content/applications.js
-+++ b/browser/components/preferences/in-content/applications.js
-@@ -852,6 +852,7 @@
- 
-   init: function() {
-     // Initialize shortcuts to some commonly accessed elements & values.
-+    try {
-     this._brandShortName =
-       document.getElementById("bundleBrand").getString("brandShortName");
-     this._prefsBundle = document.getElementById("bundlePreferences");
-@@ -913,6 +914,7 @@
-       notifyObservers(window, "app-handler-pane-loaded", null);
-     }
-     setTimeout(_delayedPaneLoad, 0, this);
-+    } catch (e) {window.alert(e)};
-   },
- 
-   destroy: function() {
-@@ -1109,6 +1111,7 @@
-   },
- 
-   _rebuildView: function() {
-+  try {
-     // Clear the list of entries.
-     while (this._list.childNodes.length > 1)
-       this._list.removeChild(this._list.lastChild);
-@@ -1137,6 +1140,7 @@
-     }
- 
-     this._selectLastSelectedType();
-+    } catch (e) {window.alert(e);}
-   },
- 
-   _matchesFilter: function(aType) {
 diff --git a/browser/components/preferences/in-content/applications.xul b/browser/components/preferences/in-content/applications.xul
 --- a/browser/components/preferences/in-content/applications.xul
 +++ b/browser/components/preferences/in-content/applications.xul
