@@ -2,6 +2,31 @@
 # Parent c758cc9b60e5d662c2d8b72f5bd4634baa3f327e
 # User Hernan Rodriguez Colmeiro <colmeiro@gmail.com>
 
+diff --git a/browser/components/preferences/handlers.css b/browser/components/preferences/handlers.css
+--- a/browser/components/preferences/handlers.css
++++ b/browser/components/preferences/handlers.css
+@@ -34,11 +34,11 @@
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+-richlistitem {
++#handlersView richlistitem {
+   -moz-binding: url("chrome://browser/content/preferences/handlers.xml#handler");
+ }
+ 
+-richlistitem[selected="true"] {
++#handlersView richlistitem[selected="true"] {
+   -moz-binding: url("chrome://browser/content/preferences/handlers.xml#handler-selected");
+ }
+ 
+@@ -52,6 +52,6 @@
+   min-width: 16px;
+ }
+ 
+-listitem.offlineapp {
++#handlersView listitem.offlineapp {
+   -moz-binding: url("chrome://browser/content/preferences/handlers.xml#offlineapp");
+ }
 diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/components/preferences/in-content/advanced.xul
 --- a/browser/components/preferences/in-content/advanced.xul
 +++ b/browser/components/preferences/in-content/advanced.xul
@@ -17,6 +42,41 @@ diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/co
  <tabbox id="advancedPrefs" flex="1"
          data-category="paneAdvanced" hidden="true"
          onselect="gAdvancedPane.tabSelectionChanged();">
+diff --git a/browser/components/preferences/in-content/applications.js b/browser/components/preferences/in-content/applications.js
+--- a/browser/components/preferences/in-content/applications.js
++++ b/browser/components/preferences/in-content/applications.js
+@@ -852,6 +852,7 @@
+ 
+   init: function() {
+     // Initialize shortcuts to some commonly accessed elements & values.
++    try {
+     this._brandShortName =
+       document.getElementById("bundleBrand").getString("brandShortName");
+     this._prefsBundle = document.getElementById("bundlePreferences");
+@@ -913,6 +914,7 @@
+       notifyObservers(window, "app-handler-pane-loaded", null);
+     }
+     setTimeout(_delayedPaneLoad, 0, this);
++    } catch (e) {window.alert(e)};
+   },
+ 
+   destroy: function() {
+@@ -1109,6 +1111,7 @@
+   },
+ 
+   _rebuildView: function() {
++  try {
+     // Clear the list of entries.
+     while (this._list.childNodes.length > 1)
+       this._list.removeChild(this._list.lastChild);
+@@ -1137,6 +1140,7 @@
+     }
+ 
+     this._selectLastSelectedType();
++    } catch (e) {window.alert(e);}
+   },
+ 
+   _matchesFilter: function(aType) {
 diff --git a/browser/components/preferences/in-content/applications.xul b/browser/components/preferences/in-content/applications.xul
 --- a/browser/components/preferences/in-content/applications.xul
 +++ b/browser/components/preferences/in-content/applications.xul
@@ -366,13 +426,15 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
  
  <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
- <?xml-stylesheet 
-   href="chrome://browser/skin/preferences/in-content/preferences.css"?>
+-<?xml-stylesheet 
+-  href="chrome://browser/skin/preferences/in-content/preferences.css"?>
 -<?xml-stylesheet 
 -  href="chrome://browser/content/preferences/handlers.css"?>
++<?xml-stylesheet href="chrome://browser/skin/preferences/in-content/preferences.css"?>
  <?xml-stylesheet href="chrome://browser/skin/preferences/applications.css"?>
- 
++<?xml-stylesheet href="chrome://browser/content/preferences/handlers.css"?>
 +
+ 
  <!DOCTYPE page [
 +<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
 +%brandDTD;
