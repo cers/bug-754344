@@ -30,7 +30,7 @@ diff --git a/browser/components/preferences/handlers.css b/browser/components/pr
 diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/components/preferences/in-content/advanced.xul
 --- a/browser/components/preferences/in-content/advanced.xul
 +++ b/browser/components/preferences/in-content/advanced.xul
-@@ -124,11 +124,6 @@
+@@ -124,13 +124,8 @@
    <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
  #endif
  
@@ -40,12 +40,15 @@ diff --git a/browser/components/preferences/in-content/advanced.xul b/browser/co
 -</hbox>
 -
  <tabbox id="advancedPrefs" flex="1"
-         data-category="paneAdvanced" hidden="true"
+-        data-category="paneAdvanced" hidden="true"
++        data-category="paneAdvanced" visible="false"
          onselect="gAdvancedPane.tabSelectionChanged();">
+ 
+   <tabs id="tabsElement">
 diff --git a/browser/components/preferences/in-content/applications.xul b/browser/components/preferences/in-content/applications.xul
 --- a/browser/components/preferences/in-content/applications.xul
 +++ b/browser/components/preferences/in-content/applications.xul
-@@ -55,11 +55,6 @@
+@@ -55,12 +55,7 @@
    <key key="&focusSearch2.key;" modifiers="accel" oncommand="gApplicationsPane.focusFilterBox();"/>
  </keyset>
  
@@ -54,25 +57,15 @@ diff --git a/browser/components/preferences/in-content/applications.xul b/browse
 -  <html:h1>&paneApplications.title;</html:h1>
 -</hbox>
 -
- <vbox data-category="paneApplications" hidden="true" flex="1">
+-<vbox data-category="paneApplications" hidden="true" flex="1">
++<vbox data-category="paneApplications" visible="false" flex="1">
    <hbox>
      <textbox id="filter" flex="1"
-diff --git a/browser/components/preferences/in-content/content.js b/browser/components/preferences/in-content/content.js
---- a/browser/components/preferences/in-content/content.js
-+++ b/browser/components/preferences/in-content/content.js
-@@ -185,6 +185,8 @@
-         if (prefs[i].fonttype)
-           FontBuilder.buildFontList(aLanguageGroup, prefs[i].fonttype, element);
- 
-+        if (!preference.setElementValue);// window.alert(i+" "+preference.id);
-+        else
-         preference.setElementValue(element);
-       }
-     }
+              type="search"
 diff --git a/browser/components/preferences/in-content/content.xul b/browser/components/preferences/in-content/content.xul
 --- a/browser/components/preferences/in-content/content.xul
 +++ b/browser/components/preferences/in-content/content.xul
-@@ -33,11 +33,6 @@
+@@ -33,12 +33,7 @@
  <script type="application/javascript" 
          src="chrome://browser/content/preferences/in-content/content.js"/>
  
@@ -81,9 +74,29 @@ diff --git a/browser/components/preferences/in-content/content.xul b/browser/com
 -  <html:h1>&paneContent.title;</html:h1>
 -</hbox>
 -
- <groupbox id="miscGroup" data-category="paneContent" hidden="true">
+-<groupbox id="miscGroup" data-category="paneContent" hidden="true">
++<groupbox id="miscGroup" data-category="paneContent" visible="false">
    <grid id="contentGrid">
      <columns>
+       <column flex="1"/>
+@@ -91,7 +86,7 @@
+ </groupbox>
+ 
+ <!-- Fonts and Colors -->
+-<groupbox id="fontsGroup" data-category="paneContent" hidden="true">
++<groupbox id="fontsGroup" data-category="paneContent" visible="false">
+   <caption label="&fontsAndColors.label;"/>
+ 
+   <grid id="fontsGrid">
+@@ -152,7 +147,7 @@
+ </groupbox>
+ 
+ <!-- Languages -->
+-<groupbox id="languagesGroup" data-category="paneContent" hidden="true">
++<groupbox id="languagesGroup" data-category="paneContent" visible="false">
+   <caption label="&languages.label;"/>
+ 
+   <hbox id="languagesBox" align="center">
 @@ -162,4 +157,4 @@
              accesskey="&chooseButton.accesskey;"
              oncommand="gContentPane.showLanguages();"/>
@@ -94,7 +107,7 @@ diff --git a/browser/components/preferences/in-content/content.xul b/browser/com
 diff --git a/browser/components/preferences/in-content/main.xul b/browser/components/preferences/in-content/main.xul
 --- a/browser/components/preferences/in-content/main.xul
 +++ b/browser/components/preferences/in-content/main.xul
-@@ -55,11 +55,6 @@
+@@ -55,13 +55,8 @@
  
  </preferences>
  
@@ -104,12 +117,33 @@ diff --git a/browser/components/preferences/in-content/main.xul b/browser/compon
 -</hbox>
 -
  <!-- Startup -->
- <groupbox id="startupGroup" data-category="paneGeneral" hidden="true">
+-<groupbox id="startupGroup" data-category="paneGeneral" hidden="true">
++<groupbox id="startupGroup" data-category="paneGeneral" visible="false">
    <caption label="&startup.label;"/>
+ 
+   <hbox align="center">
+@@ -127,7 +122,7 @@
+ </groupbox>
+ 
+ <!-- Downloads -->
+-<groupbox id="downloadsGroup" data-category="paneGeneral" hidden="true">
++<groupbox id="downloadsGroup" data-category="paneGeneral" visible="false">
+   <caption label="&downloads.label;"/>
+ 
+   <checkbox id="showWhenDownloading"
+@@ -178,7 +173,7 @@
+   </radiogroup>
+ </groupbox>
+ 
+-<hbox class="bottomBox" data-category="paneGeneral" hidden="true">
++<hbox class="bottomBox" data-category="paneGeneral" visible="false">
+   <groupbox id="addonsMgrGroup"
+             orient="horizontal"
+             flex="1">
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
-@@ -12,66 +12,172 @@
+@@ -12,66 +12,171 @@
  Cu.import("resource://gre/modules/XPCOMUtils.jsm");
  Cu.import("resource://gre/modules/Services.jsm");
  
@@ -124,12 +158,12 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +  forwardButton: null,
 +  backButton: null,
 +  initialize: function gPreferences__initialize() {
++    document.documentElement.instantApply = true;
 +    this.categories = document.getElementById("categories");
 +    this.backButton = document.getElementById("back-btn");
 +    this.forwardButton = document.getElementById("forward-btn");
 +    gHeader.initialize();
 +    this.gotoPref("paneGeneral");
-+    document.documentElement.instantApply = true;
 +    window.addEventListener("popstate", this.onStatePopped, true);
 +    this.updateCommands();
 +    gMainPane.init();
@@ -213,8 +247,7 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +  search: function gPreferences__search(aQuery, aAttribute) {
 +    let elements = document.getElementById("mainPrefPane").children;
 +    for (let element of elements) {
-+      let attributeValue = element.getAttribute(aAttribute);
-+      element.hidden = (attributeValue != aQuery);
++      element.setAttribute("visible", (element.getAttribute(aAttribute) == aQuery));
 +    }
 +  }
  }
@@ -339,48 +372,9 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 diff --git a/browser/components/preferences/in-content/preferences.xul b/browser/components/preferences/in-content/preferences.xul
 --- a/browser/components/preferences/in-content/preferences.xul
 +++ b/browser/components/preferences/in-content/preferences.xul
-@@ -1,20 +1,61 @@
- <?xml version="1.0"?>
--<!-- This Source Code Form is subject to the terms of the Mozilla Public
--   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
--   - You can obtain one at http://mozilla.org/MPL/2.0/. -->
-+<!-- ***** BEGIN LICENSE BLOCK *****
-+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
-+   -
-+   - The contents of this file are subject to the Mozilla Public License Version
-+   - 1.1 (the "License"); you may not use this file except in compliance with
-+   - the License. You may obtain a copy of the License at
-+   - http://www.mozilla.org/MPL/
-+   -
-+   - Software distributed under the License is distributed on an "AS IS" basis,
-+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
-+   - for the specific language governing rights and limitations under the
-+   - License.
-+   -
-+   - The Original Code is the Extension Manager UI.
-+   -
-+   - The Initial Developer of the Original Code is
-+   - the Mozilla Foundation.
-+   - Portions created by the Initial Developer are Copyright (C) 2010
-+   - the Initial Developer. All Rights Reserved.
-+   -
-+   - Contributor(s):
-+   -   Blair McBride <bmcbride@mozilla.com>
-+   -   David Dahl <ddahl@mozilla.com>
-+   -
-+   - Alternatively, the contents of this file may be used under the terms of
-+   - either the GNU General Public License Version 2 or later (the "GPL"), or
-+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
-+   - in which case the provisions of the GPL or the LGPL are applicable instead
-+   - of those above. If you wish to allow use of your version of this file only
-+   - under the terms of either the GPL or the LGPL, and not to allow others to
-+   - use your version of this file under the terms of the MPL, indicate your
-+   - decision by deleting the provisions above and replace them with the notice
-+   - and other provisions required by the LGPL or the GPL. If you do not delete
-+   - the provisions above, a recipient may use your version of this file under
-+   - the terms of any one of the MPL, the GPL or the LGPL.
-+   -
-+   - ***** END LICENSE BLOCK ***** -->
+@@ -3,18 +3,25 @@
+    - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+    - You can obtain one at http://mozilla.org/MPL/2.0/. -->
  
 -<?xml-stylesheet href="chrome://global/skin/global.css"?>
 +<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
@@ -409,7 +403,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
  <!ENTITY % preferencesDTD SYSTEM 
    "chrome://browser/locale/preferences/preferences.dtd">
-@@ -54,42 +95,108 @@
+@@ -54,42 +61,108 @@
  #define USE_WIN_TITLE_STYLE
  #endif
  
@@ -427,7 +421,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 -      title="&prefWindow.titleGNOME;">
 +      title="&prefWindow.titleGNOME;"
  #endif
-+     role="application" windowtype="Preferences:Manager"
++      role="application" windowtype="Preferences:Manager"
 +      disablefastfind="true"
 +      onload="gPreferences.initialize()"
 +      ondragenter="gDragDrop.onDragOver(event)"
@@ -542,7 +536,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  #include main.xul
  #include tabs.xul
  #include privacy.xul
-@@ -100,7 +207,19 @@
+@@ -100,7 +173,19 @@
  #ifdef MOZ_SERVICES_SYNC
  #include sync.xul
  #endif
@@ -567,7 +561,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 diff --git a/browser/components/preferences/in-content/privacy.xul b/browser/components/preferences/in-content/privacy.xul
 --- a/browser/components/preferences/in-content/privacy.xul
 +++ b/browser/components/preferences/in-content/privacy.xul
-@@ -66,11 +66,6 @@
+@@ -66,13 +66,8 @@
  
  </preferences>
  
@@ -577,8 +571,29 @@ diff --git a/browser/components/preferences/in-content/privacy.xul b/browser/com
 -</hbox>
 -
  <!-- Tracking -->
- <groupbox id="trackingGroup" data-category="panePrivacy" hidden="true">
+-<groupbox id="trackingGroup" data-category="panePrivacy" hidden="true">
++<groupbox id="trackingGroup" data-category="panePrivacy" visible="false">
    <caption label="&tracking.label;"/>
+ 
+   <checkbox id="privacyDoNotTrackPrefs"
+@@ -82,7 +77,7 @@
+ </groupbox>
+ 
+ <!-- History -->
+-<groupbox id="historyGroup" data-category="panePrivacy" hidden="true">
++<groupbox id="historyGroup" data-category="panePrivacy" visible="false">
+   <caption label="&history.label;"/>
+   <hbox align="center">
+     <label id="historyModeLabel"
+@@ -201,7 +196,7 @@
+ </groupbox>
+ 
+ <!-- Location Bar -->
+-<groupbox id="locationBarGroup" data-category="panePrivacy" hidden="true">
++<groupbox id="locationBarGroup" data-category="panePrivacy" visible="false">
+   <caption label="&locationBar.label;"/>
+   <hbox align="center">
+     <label id="locationBarSuggestionLabel"
 @@ -220,4 +215,4 @@
      </menulist>
      <label>&locbar.post.label;</label>
@@ -589,7 +604,7 @@ diff --git a/browser/components/preferences/in-content/privacy.xul b/browser/com
 diff --git a/browser/components/preferences/in-content/security.xul b/browser/components/preferences/in-content/security.xul
 --- a/browser/components/preferences/in-content/security.xul
 +++ b/browser/components/preferences/in-content/security.xul
-@@ -30,11 +30,6 @@
+@@ -30,13 +30,8 @@
  
  </preferences>
  
@@ -599,12 +614,24 @@ diff --git a/browser/components/preferences/in-content/security.xul b/browser/co
 -</hbox>
 -
  <!-- addons, forgery (phishing) UI -->
- <groupbox id="addonsPhishingGroup" data-category="paneSecurity" hidden="true">
+-<groupbox id="addonsPhishingGroup" data-category="paneSecurity" hidden="true">
++<groupbox id="addonsPhishingGroup" data-category="paneSecurity" visible="false">
    <hbox id="addonInstallBox">
+     <checkbox id="warnAddonInstall" flex="1"
+               label="&warnAddonInstall.label;"
+@@ -61,7 +56,7 @@
+ </groupbox>
+ 
+ <!-- Passwords -->
+-<groupbox id="passwordsGroup" orient="vertical" data-category="paneSecurity" hidden="true">
++<groupbox id="passwordsGroup" orient="vertical" data-category="paneSecurity" visible="false">
+   <caption label="&passwords.label;"/>
+ 
+   <hbox id="savePasswordsBox">
 diff --git a/browser/components/preferences/in-content/sync.xul b/browser/components/preferences/in-content/sync.xul
 --- a/browser/components/preferences/in-content/sync.xul
 +++ b/browser/components/preferences/in-content/sync.xul
-@@ -28,11 +28,6 @@
+@@ -28,12 +28,7 @@
  <script type="application/javascript"
          src="chrome://browser/content/sync/utils.js"/>
  
@@ -613,13 +640,15 @@ diff --git a/browser/components/preferences/in-content/sync.xul b/browser/compon
 -  <html:h1>&paneSync.title;</html:h1>
 -</hbox>
 -
- <deck id="weavePrefsDeck" data-category="paneSync" hidden="true">
+-<deck id="weavePrefsDeck" data-category="paneSync" hidden="true">
++<deck id="weavePrefsDeck" data-category="paneSync" visible="false">
    <vbox id="noAccount" align="center">
      <spacer flex="1"/>
+     <description id="syncDesc">
 diff --git a/browser/components/preferences/in-content/tabs.xul b/browser/components/preferences/in-content/tabs.xul
 --- a/browser/components/preferences/in-content/tabs.xul
 +++ b/browser/components/preferences/in-content/tabs.xul
-@@ -30,11 +30,6 @@
+@@ -30,13 +30,8 @@
  #endif
  </preferences>
  
@@ -629,8 +658,49 @@ diff --git a/browser/components/preferences/in-content/tabs.xul b/browser/compon
 -</hbox>
 -
  <checkbox id="linkTargeting" label="&newWindowsAsTabs.label;"
-           data-category="paneTabs" hidden="true"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
            accesskey="&newWindowsAsTabs.accesskey;"
+           preference="browser.link.open_newwindow"
+           onsyncfrompreference="return gTabsPane.readLinkTarget();"
+@@ -44,32 +39,32 @@
+           class="indent"/>
+ 
+ <checkbox id="warnCloseMultiple" label="&warnCloseMultipleTabs.label;"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
+           accesskey="&warnCloseMultipleTabs.accesskey;"
+           preference="browser.tabs.warnOnClose"
+           class="indent"/>
+ 
+ <checkbox id="warnOpenMany" label="&warnOpenManyTabs.label;"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
+           accesskey="&warnOpenManyTabs.accesskey;"
+           preference="browser.tabs.warnOnOpen"
+           class="indent"/>
+ 
+ <checkbox id="showTabBar" label="&showTabBar.label;"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
+           accesskey="&showTabBar.accesskey;"
+           preference="browser.tabs.autoHide"
+           class="indent"/>
+ 
+ <checkbox id="switchToNewTabs" label="&switchToNewTabs.label;"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
+           accesskey="&switchToNewTabs.accesskey;"
+           preference="browser.tabs.loadInBackground"
+           class="indent"/>
+ 
+ #ifdef XP_WIN
+ <checkbox id="showTabsInTaskbar" label="&showTabsInTaskbar.label;"
+-          data-category="paneTabs" hidden="true"
++          data-category="paneTabs" visible="false"
+           accesskey="&showTabsInTaskbar.accesskey;"
+           preference="browser.taskbar.previews.enable"
+           class="indent"/>
 diff --git a/browser/themes/pinstripe/jar.mn b/browser/themes/pinstripe/jar.mn
 --- a/browser/themes/pinstripe/jar.mn
 +++ b/browser/themes/pinstripe/jar.mn
@@ -688,6 +758,14 @@ diff --git a/browser/themes/pinstripe/preferences/in-content/preferences.css b/b
  .preference-icon[type="general"],
  .landingButton-icon[type="general"] {
    background-position: 0 0;
+@@ -169,3 +198,7 @@
+   box-shadow: inset 0 0 4px rgb(45,54,71), 0 1px rgba(255,255,255,0.25);
+   background-image: -moz-linear-gradient(rgba(45,54,71,0.6), rgba(45,54,71,0));
+ }
++
++#mainPrefPane *[visible=false] {
++  visibility: collapse;
++}
 diff --git a/browser/themes/pinstripe/preferences/prefs-advanced.png b/browser/themes/pinstripe/preferences/prefs-advanced.png
 new file mode 100644
 index 0000000000000000000000000000000000000000..76f91a94b312dc35c8305514445591347b1d314f
