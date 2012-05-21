@@ -278,7 +278,7 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 -  document.getElementById("back-btn").disabled = !canGoBack();
 -  document.getElementById("forward-btn").disabled = !canGoForward();
 -}
-+  initialize: function() {
++  initialize: function gHeader__initialize() {
 +    this._search = document.getElementById("header-search");
  
 -function canGoBack() {
@@ -320,11 +320,11 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +    updateNavButtonVisibility();
 +  },
 +
-+  focusSearchBox: function() {
++  focusSearchBox: function gHeader__focusSearchBox() {
 +    this._search.focus();
 +  },
 +
-+  onKeyPress: function(aEvent) {
++  onKeyPress: function gHeader__onKeyPres(aEvent) {
 +    if (String.fromCharCode(aEvent.charCode) == "/") {
 +      this.focusSearchBox();
 +    }
