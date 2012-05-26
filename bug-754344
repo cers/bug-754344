@@ -404,7 +404,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
  <!ENTITY % preferencesDTD SYSTEM 
    "chrome://browser/locale/preferences/preferences.dtd">
-@@ -54,42 +62,108 @@
+@@ -54,42 +62,110 @@
  #define USE_WIN_TITLE_STYLE
  #endif
  
@@ -517,11 +517,13 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
 +                    name="&paneSecurity.title;" priority="102000"
 +                    tooltiptext="&paneSecurity.title;"
 +                    onclick="gPreferences.gotoPref('paneSecurity')"/>
++#ifdef MOZ_SERVICES_SYNC
 +      <richlistitem id="category-sync" value="preferences://sync"
 +                    class="category"
 +                    name="&paneSync.title;" priority="102000"
 +                    tooltiptext="&paneSync.title;"
 +                    onclick="gPreferences.gotoPref('paneSync')"/>
++#endif
 +      <richlistitem id="category-advanced" value="preferences://advanced"
 +                    class="category"
 +                    name="&paneAdvanced.title;" priority="102000"
@@ -537,7 +539,7 @@ diff --git a/browser/components/preferences/in-content/preferences.xul b/browser
  #include main.xul
  #include tabs.xul
  #include privacy.xul
-@@ -100,7 +174,19 @@
+@@ -100,7 +176,19 @@
  #ifdef MOZ_SERVICES_SYNC
  #include sync.xul
  #endif
