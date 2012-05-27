@@ -143,7 +143,7 @@ diff --git a/browser/components/preferences/in-content/main.xul b/browser/compon
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
-@@ -12,66 +12,171 @@
+@@ -12,66 +12,188 @@
  Cu.import("resource://gre/modules/XPCOMUtils.jsm");
  Cu.import("resource://gre/modules/Services.jsm");
  
@@ -189,6 +189,23 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +    var initFinished = document.createEvent("Event");
 +    initFinished.initEvent("Initialized", true, true);
 +    document.dispatchEvent(initFinished);
++
++    // monkeypatch openDialog if needed
++    window._openDialog = window.openDialog;
++    window.openDialog = function() {
++      var dialog = window._openDialog.apply(this, arguments);
++      var prefs = Components.classes["@mozilla.org/preferences-service;1"]
++                            .getService(Components.interfaces.nsIPrefService)
++                            .getBranch("browser.preferences.");
++
++      var inContent = prefs.getBoolPref("inContent");
++      if (inContent) {
++        dialog.addEventListener("load", function() {
++          dialog.document.documentElement.instantApply = true;
++        }, false);
++      }
++      return dialog;
++    }
 +  },
 +
 +  gotoPref: function gPreferences__gotoPref(page) {
