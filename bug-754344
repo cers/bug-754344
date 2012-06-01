@@ -739,6 +739,20 @@ diff --git a/browser/components/preferences/jar.mn b/browser/components/preferen
  *   content/browser/preferences/languages.xul
  *   content/browser/preferences/languages.js
  *   content/browser/preferences/main.xul
+diff --git a/browser/components/preferences/main.xul b/browser/components/preferences/main.xul
+--- a/browser/components/preferences/main.xul
++++ b/browser/components/preferences/main.xul
+@@ -64,7 +64,9 @@
+                   name="browser.download.dir"
+                   type="file"
+                   onchange="gMainPane.displayDownloadDirPref();"/>
+-      <preference id="browser.download.folderList"        name="browser.download.folderList"        type="int"/>
++      <preference id="browser.download.folderList"
++                  name="browser.download.folderList"
++                  type="int"/>
+ 
+     </preferences>
+     
 diff --git a/browser/components/preferences/preferences.css b/browser/components/preferences/preferences.css
 new file mode 100644
 --- /dev/null
