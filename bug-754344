@@ -1,5 +1,5 @@
 # HG changeset patch
-# Parent f4981b5e1f7a1b7e951c7013a2bc30fb72c0e01c
+# Parent 7e4c2abb9fc95d9484fd234e3bbf4b58d1c3f2c3
 # User Hernan Rodriguez Colmeiro <colmeiro@gmail.com>
 try: -b o -p linux,linux64,macosx64,win32,win64 -u none -t none
 
@@ -228,7 +228,7 @@ diff --git a/browser/components/preferences/in-content/main.xul b/browser/compon
 diff --git a/browser/components/preferences/in-content/preferences.js b/browser/components/preferences/in-content/preferences.js
 --- a/browser/components/preferences/in-content/preferences.js
 +++ b/browser/components/preferences/in-content/preferences.js
-@@ -7,71 +7,193 @@
+@@ -7,71 +7,176 @@
  const Cc = Components.classes;
  const Ci = Components.interfaces;
  const Cu = Components.utils;
@@ -279,23 +279,6 @@ diff --git a/browser/components/preferences/in-content/preferences.js b/browser/
 +    var initFinished = document.createEvent("Event");
 +    initFinished.initEvent("Initialized", true, true);
 +    document.dispatchEvent(initFinished);
-+
-+    // monkeypatch openDialog if needed
-+    window._openDialog = window.openDialog;
-+    window.openDialog = function() {
-+      var dialog = window._openDialog.apply(this, arguments);
-+      var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-+                            .getService(Components.interfaces.nsIPrefService)
-+                            .getBranch("browser.preferences.");
-+
-+      var inContent = prefs.getBoolPref("inContent");
-+      if (inContent) {
-+        dialog.addEventListener("load", function() {
-+          dialog.document.documentElement.instantApply = true;
-+        }, false);
-+      }
-+      return dialog;
-+    }
 +  },
 +
 +  gotoPref: function gPreferences__gotoPref(page) {
@@ -1758,7 +1741,7 @@ c6@Lxi0mR@!nEg%qmjD0&07*qoM6N<$f_`&9Qvd(}
 diff --git a/browser/themes/winstripe/jar.mn b/browser/themes/winstripe/jar.mn
 --- a/browser/themes/winstripe/jar.mn
 +++ b/browser/themes/winstripe/jar.mn
-@@ -285,17 +285,25 @@ browser.jar:
+@@ -289,17 +289,25 @@ browser.jar:
          skin/classic/aero/browser/places/allBookmarks.png            (places/allBookmarks-aero.png)
          skin/classic/aero/browser/places/unsortedBookmarks.png       (places/unsortedBookmarks-aero.png)
          skin/classic/aero/browser/places/downloads.png               (places/downloads.png)
